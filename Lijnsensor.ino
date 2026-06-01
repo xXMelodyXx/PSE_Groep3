@@ -1,13 +1,20 @@
-#include <Wire.h>
-#include "lijnsensor.h"
+//#include <Wire.h>
+
+#include "Lijnsensor.h"
+
+#include <Zumo32U4.h>
+#include "XbeeControl.h"
+
 
 Zumo32U4ButtonC buttonC;
 
 Lijnsensor lijnsensor;
+XBeeControl xbee;
 
 void setup() {
-  //calibreren van de benodoigden kleuren
+  //calibreren van de benodigde kleuren
   Serial.begin(9600);
+  xbee.begin();
   delay(2000);
   lijnsensor.init();
   Serial.println("Leg de ZUMO op WIT");
@@ -50,4 +57,5 @@ void setup() {
 void loop() {
   lijnsensor.read(false, 2);
   //TODO Serial.println(lijnsensor.bepaalRichting());
+  xbee.update();
 }
