@@ -1,5 +1,5 @@
-#include "WString.h"
-#include "lijnsensor.h"
+//#include "WString.h"
+#include "Lijnsensor.h"
 
 Lijnsensor::Lijnsensor() {}
 
