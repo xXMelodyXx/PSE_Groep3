@@ -1,4 +1,4 @@
-//#include <Wire.h>
+#include <Wire.h>
 
 #include "Lijnsensor.h"
 
@@ -14,7 +14,6 @@ XBeeControl xbee;
 void setup() {
   //calibreren van de benodigde kleuren
   Serial.begin(9600);
-  xbee.begin();
   delay(2000);
   lijnsensor.init();
   Serial.println("Leg de ZUMO op WIT");
@@ -51,11 +50,19 @@ void setup() {
   delay(1000);
   lijnsensor.calibrateGray(false);
   */
+  xbee.begin();
 }
 
 
 void loop() {
-  lijnsensor.read(false, 2);
-  //TODO Serial.println(lijnsensor.bepaalRichting());
   xbee.update();
+  lijnsensor.read(false, 2);
+  lijnsensor.read(false,1);
+  lijnsensor.read(false,3);
+  lijnsensor.read(false,0);
+  lijnsensor.read(false,4);
+  
+  
+  //TODO Serial.println(lijnsensor.bepaalRichting());
+  
 }
