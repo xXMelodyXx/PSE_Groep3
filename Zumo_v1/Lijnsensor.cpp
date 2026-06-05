@@ -17,7 +17,7 @@ void Lijnsensor::init() {
     greenMax[i] = 0;
   }
 }
-
+/*
 void Lijnsensor::calibreer(bool debug, int waarde_min[5], int waarde_max[5]) {
   lineSensors.calibrate();
   // bool debug gebruikt om onnodige data outprint te beperken en overzichterlijker te maken
@@ -60,14 +60,10 @@ void Lijnsensor::calibreer(bool debug, int waarde_min[5], int waarde_max[5]) {
   }
 }
 
+*/
 void Lijnsensor::calibrateWhite(bool debug) {
   lineSensors.calibrate();
 }
-/*
-void Lijnsensor::calibrateBlack(bool debug) {
-  calibreer(debug, blackMin, blackMax);
-}
-*/
 
 void Lijnsensor::calibrateBlack(bool debug) {
   lineSensors.calibrate();
@@ -112,13 +108,10 @@ void Lijnsensor::calibrateBlack(bool debug) {
   }
 }
 
-/*
-void Lijnsensor::calibrateGreen(bool debug) {
-  calibreer(debug, greenMin, greenMax);
-}
-*/
 
 void Lijnsensor::calibrateGreen(bool debug) {
+  lineSensors.calibrate();
+
   lineSensors.read(sensorValues);
   for (int i = 0; i < 5; i++) {
     greenMin[i] = sensorValues[i];
@@ -151,7 +144,7 @@ void Lijnsensor::calibrateGreen(bool debug) {
     Serial1.println(greenMin[i]);
     Serial1.print("Green max: ");
     Serial1.println(greenMax[i]);
-    
+
     //TODO voor grijs & bruin
   }
 }
@@ -248,16 +241,15 @@ void Lijnsensor::read(bool debug, int sensorNr) {
 
   if (zwartGedetecteerd) {
     Serial1.println(">>> ZWARTE LIJN GEDETECTEERD");
-    motors.setSpeeds(200,200);
+    motors.setSpeeds(200, 200);
   } else if (groenGedetecteerd) {
     Serial1.println(">>> GROENE LIJN GEDETECTEERD");
-    motors.setSpeeds(100,100);
+    motors.setSpeeds(100, 100);
   }
 
-    else if (grijsGedetecteerd){
-      Serial1.println(">>> GRIJZE LIJN GEDETECTEERD");
-    }
-   else {
+  else if (grijsGedetecteerd) {
+    Serial1.println(">>> GRIJZE LIJN GEDETECTEERD");
+  } else {
     Serial1.println(">>> GEEN LIJN");
   }
 

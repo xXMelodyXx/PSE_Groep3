@@ -29,14 +29,14 @@ void setup() {
   lijnsensor.calibrateBlack(false);
 
   Serial.println("zwart gescand");
-  /*  Serial.println("Leg de ZUMO op Groen");
+  Serial.println("Leg de ZUMO op Groen");
   Serial.println("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
   lijnsensor.calibrateGreen(false);
 
   Serial.println("groen gescand");
-  /*
+
   Serial.println("Leg de ZUMO op Bruin");
   Serial.println("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
@@ -49,7 +49,6 @@ void setup() {
   while (buttonC.isPressed() == false) {}
   delay(1000);
   lijnsensor.calibrateGray(false);
-  */
   xbee.begin();
 }
 
@@ -57,12 +56,11 @@ void setup() {
 void loop() {
   xbee.update();
   lijnsensor.read(false, 2);
-  lijnsensor.read(false,1);
-  lijnsensor.read(false,3);
-  lijnsensor.read(false,0);
-  lijnsensor.read(false,4);
-  
-  
+  lijnsensor.read(false, 1);
+  lijnsensor.read(false, 3);
+  lijnsensor.read(false, 0);
+  lijnsensor.read(false, 4);
+
+
   //TODO Serial.println(lijnsensor.bepaalRichting());
-  
 }
