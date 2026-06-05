@@ -3,7 +3,7 @@
 #include "XbeeControl.h"
 
 Lijnsensor::Lijnsensor() {}
-Zumo32U4Motors motors;
+//Zumo32U4Motors motors;
 
 void Lijnsensor::init() {
   lineSensors.initFiveSensors();
@@ -125,10 +125,10 @@ void Lijnsensor::calibrateGreen(bool debug) {
         Serial1.println(sensorValues[i]);
       }
       if (sensorValues[i] < greenMin[i]) {
-        greenMin[i] = sensorValues[j];
+        greenMin[i] = sensorValues[i];
       }
       if (sensorValues[i] > greenMax[i]) {
-        greenMax[i] = sensorValues[j];
+        greenMax[i] = sensorValues[i];
       }
       delay(5);
     }
@@ -166,10 +166,10 @@ void Lijnsensor::calibrateGray(bool debug) {
         Serial1.println(sensorValues[i]);
       }
       if (sensorValues[i] < grayMin[i]) {
-        grayMin[i] = sensorValues[j];
+        grayMin[i] = sensorValues[i];
       }
       if (sensorValues[i] > grayMax[i]) {
-        grayMax[i] = sensorValues[j];
+        grayMax[i] = sensorValues[i];
       }
       delay(5);
     }
@@ -205,10 +205,10 @@ void Lijnsensor::calibrateBrown(bool debug) {
         Serial1.println(sensorValues[i]);
       }
       if (sensorValues[i] < brownMin[i]) {
-        brownMin[i] = sensorValues[j];
+        brownMin[i] = sensorValues[i];
       }
       if (sensorValues[i] > brownMax[i]) {
-        brownMax[i] = sensorValues[j];
+        brownMax[i] = sensorValues[i];
       }
       delay(5);
     }
@@ -227,61 +227,11 @@ void Lijnsensor::calibrateBrown(bool debug) {
 
   }
 }
-
+/*
 void Lijnsensor::calibrateGray(bool debug) {
   calibreer(debug, grayMin, grayMax);
-}
+}*/
 
-/*
-void Lijnsensor::read(bool debug) {
-  lineSensors.read(sensorValues);
-
-  bool zwartGedetecteerd = false;
-  bool groenGedetecteerd = false;
-  bool grijsGedetecteerd = false;
-  if (debug == true) {
-    for (int i = 0; i < 5; i++) {
-      int waarde = sensorValues[i];
-
-      Serial1.print("Sensor ");
-      Serial1.print(i);
-      Serial1.print(": ");
-      Serial1.println(waarde);
-    }
-  }
-  if (sensorValues[2] >= blackMin[2] && sensorValues[2] <= blackMax[2]) {
-    zwartGedetecteerd = true;
-  }
-
-  if (sensorValues[2] >= greenMin[2] && sensorValues[2] <= greenMax[2]) {
-    groenGedetecteerd = true;
-  }
-  if (sensorValues[2] >= grijsGedetecteerd[2] && sensorValues[2] <= grijsGedetecteerd[2]) {
-    grijsGedetecteerd = true;
-  }
-//geen grijs en bruin nog toegevoegd
-  if (zwartGedetecteerd) {
-    Serial1.println(">>> ZWARTE LIJN GEDETECTEERD");
-  } 
-  else if (groenGedetecteerd) {
-    Serial1.println(">>> GROENE LIJN GEDETECTEERD");
-  }
-
-  else if(grijsGedetecteerd){
-      Serial1.println("GRIJZE LIJN GEDETECTEERD");
-    }
-   else {
-    Serial1.println(">>> GEEN LIJN");
-  }
-
-  Serial1.println("--------------------");
-  delay(100);
-  // TODO voor sensor 1, 3, 0, 4
-  // TODO (if) left, center, right
-  // TODO grijs eerst volgende kruising een bocht die kant op
-  // TODO bruin stoppen
-}
-*/
 
 void Lijnsensor::read(bool debug, int sensorNr) {
   lineSensors.read(sensorValues);
@@ -302,9 +252,10 @@ void Lijnsensor::read(bool debug, int sensorNr) {
   }
   if (sensorValues[sensorNr] >= blackMin[sensorNr] && sensorValues[sensorNr] <= blackMax[sensorNr]) {
     zwartGedetecteerd = true;
-    for 
-    //if (sensorValues[0] && zwartGedetecteerd = true) {
-    //  s0zwart = true; }
+    
+    
+    
+
   }
 
   if (sensorValues[sensorNr] >= greenMin[sensorNr] && sensorValues[sensorNr] <= greenMax[sensorNr]) {
@@ -317,10 +268,10 @@ void Lijnsensor::read(bool debug, int sensorNr) {
 
   if (zwartGedetecteerd) {
     Serial1.println(">>> ZWARTE LIJN GEDETECTEERD");
-    motors.setSpeeds(200, 200);
+   // motors.setSpeeds(200, 200);
   } else if (groenGedetecteerd) {
     Serial1.println(">>> GROENE LIJN GEDETECTEERD");
-    motors.setSpeeds(100, 100);
+    //motors.setSpeeds(100, 100);
   }
 
   else if (grijsGedetecteerd) {
@@ -333,6 +284,55 @@ void Lijnsensor::read(bool debug, int sensorNr) {
   delay(100);
 }
 
-String Lijnsensor::bepaalRichting() {
-  return "richting";
+
+
+
+ 
+
+// String Lijnsensor::bepaalRichting() {
+//   return "richting";
   //TODO richting vastellen afhankelijk van gebruikte positie sensor
+
+
+  char Lijnsensor::bepaalRichting() {
+
+  lineSensors.read(sensorValues);
+
+  bool s[5];
+
+  for (int i = 0; i < 5; i++) {
+
+    s[i] =
+      sensorValues[i] >= blackMin[i] &&
+      sensorValues[i] <= blackMax[i];
+  }
+
+  // patroon:
+  // [0] [1] [2] [3] [4]
+
+//rechtdoor
+  if (s[2] && !s[0] && !s[4]) {
+    return 'D';
+  }
+
+//links
+  if (s[0] || s[1]) {
+    return 'A';
+  }
+
+//Rechts
+  if (s[3] || s[4]) {
+    return 'Z';
+  }
+
+//Scherpe links
+  if (s[0] && s[1] && s[2]) {
+    return 'L';
+  }
+
+//Scherpe rechts
+  if (s[2] && s[3] && s[4]) {
+    return 'R';
+  }
+
+}

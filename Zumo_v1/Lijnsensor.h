@@ -43,5 +43,5 @@ public:
   void calibrateGray(bool debug);
   void read(bool debug);
   void read(bool debug, int sensorNr);
-  String bepaalRichting();
+  char bepaalRichting();
 };

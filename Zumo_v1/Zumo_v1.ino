@@ -7,6 +7,7 @@
 
 
 Zumo32U4ButtonC buttonC;
+Zumo32U4Motors motors;
 
 Lijnsensor lijnsensor;
 XBeeControl xbee;
@@ -61,6 +62,35 @@ void loop() {
   lijnsensor.read(false, 0);
   lijnsensor.read(false, 4);
 
+  char richting = lijnsensor.bepaalRichting();
 
-  //TODO Serial.println(lijnsensor.bepaalRichting());
+  switch (richting) {
+
+    case 'D':
+      motors.setSpeeds(200, 200);
+      break;
+
+    case 'A':
+      motors.setSpeeds(50, 200);
+      break;
+
+    case 'Z':
+      motors.setSpeeds(200, 50);
+      break;
+
+    case 'L':
+      motors.setSpeeds(0, 200);
+      break;
+
+    case 'R':
+      motors.setSpeeds(200, 0);
+      break;
+
+    // case "KRUISING":
+    //   motors.setSpeeds(0, 0);
+    //   break;
+  }
+    
+  
+  
 }
