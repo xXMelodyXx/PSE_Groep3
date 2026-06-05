@@ -149,13 +149,84 @@ void Lijnsensor::calibrateGreen(bool debug) {
   }
 }
 
-/*
-void Lijnsensor::calibrateBrown(bool debug) {
-  calibreer(debug, brownMin, brownMax);
-  //calibreer(debug, color_Min[0], color_Max[0]);
-}
-*/
 
+void Lijnsensor::calibrateGray(bool debug) {
+  lineSensors.calibrate();
+
+  lineSensors.read(sensorValues);
+  for (int i = 0; i < 5; i++) {
+    grayMin[i] = sensorValues[i];
+    grayMax[i] = sensorValues[i];
+
+    totaal = 0;
+    for (int j = 0; j < 40; j++) {
+      lineSensors.read(sensorValues);
+      totaal += sensorValues[i];
+      if (debug == true) {
+        Serial1.println(sensorValues[i]);
+      }
+      if (sensorValues[i] < grayMin[i]) {
+        grayMin[i] = sensorValues[j];
+      }
+      if (sensorValues[i] > grayMax[i]) {
+        grayMax[i] = sensorValues[j];
+      }
+      delay(5);
+    }
+
+    grayValue[i] = totaal / 40;
+    grayMin[i] = grayMin[i] - 30;
+    grayMax[i] = grayMax[i] + 30;
+
+    Serial1.println("GRAY KALIBRATIE KLAAR");
+    Serial1.print("graywaarde: ");
+    Serial1.println(grayValue[i]);
+    Serial1.print("Gray min: ");
+    Serial1.println(grayMin[i]);
+    Serial1.print("Gray max: ");
+    Serial1.println(grayMax[i]);
+
+  }
+}
+
+void Lijnsensor::calibrateBrown(bool debug) {
+  lineSensors.calibrate();
+
+  lineSensors.read(sensorValues);
+  for (int i = 0; i < 5; i++) {
+    brownMin[i] = sensorValues[i];
+    brownMax[i] = sensorValues[i];
+
+    totaal = 0;
+    for (int j = 0; j < 40; j++) {
+      lineSensors.read(sensorValues);
+      totaal += sensorValues[i];
+      if (debug == true) {
+        Serial1.println(sensorValues[i]);
+      }
+      if (sensorValues[i] < brownMin[i]) {
+        brownMin[i] = sensorValues[j];
+      }
+      if (sensorValues[i] > brownMax[i]) {
+        brownMax[i] = sensorValues[j];
+      }
+      delay(5);
+    }
+
+    brownValue[i] = totaal / 40;
+    brownMin[i] = brownMin[i] - 30;
+    brownMax[i] = brownMax[i] + 30;
+
+    Serial1.println("BROWN KALIBRATIE KLAAR");
+    Serial1.print("Brown waarde: ");
+    Serial1.println(brownValue[i]);
+    Serial1.print("Brown min: ");
+    Serial1.println(brownMin[i]);
+    Serial1.print("Brown max: ");
+    Serial1.println(brownMax[i]);
+
+  }
+}
 
 void Lijnsensor::calibrateGray(bool debug) {
   calibreer(debug, grayMin, grayMax);
@@ -218,6 +289,8 @@ void Lijnsensor::read(bool debug, int sensorNr) {
   bool zwartGedetecteerd = false;
   bool groenGedetecteerd = false;
   bool grijsGedetecteerd = false;
+  bool brownGedetecteerd = false;
+
   if (debug == true) {
 
     int waarde = sensorValues[sensorNr];
@@ -229,6 +302,9 @@ void Lijnsensor::read(bool debug, int sensorNr) {
   }
   if (sensorValues[sensorNr] >= blackMin[sensorNr] && sensorValues[sensorNr] <= blackMax[sensorNr]) {
     zwartGedetecteerd = true;
+    for 
+    //if (sensorValues[0] && zwartGedetecteerd = true) {
+    //  s0zwart = true; }
   }
 
   if (sensorValues[sensorNr] >= greenMin[sensorNr] && sensorValues[sensorNr] <= greenMax[sensorNr]) {
@@ -260,4 +336,3 @@ void Lijnsensor::read(bool debug, int sensorNr) {
 String Lijnsensor::bepaalRichting() {
   return "richting";
   //TODO richting vastellen afhankelijk van gebruikte positie sensor
-}
