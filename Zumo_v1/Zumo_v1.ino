@@ -55,12 +55,5 @@ void setup() {
 
 void loop() {
   xbee.update();
-  lijnsensor.read(false, 2);
-  lijnsensor.read(false, 1);
-  lijnsensor.read(false, 3);
-  lijnsensor.read(false, 0);
-  lijnsensor.read(false, 4);
-
-
   //TODO Serial.println(lijnsensor.bepaalRichting());
 }

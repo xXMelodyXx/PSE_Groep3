@@ -1,27 +1,24 @@
 #include <Wire.h>
 #include <Zumo32U4.h>
 
+struct sensordata {
+  int Value[5];
+  int Min[5];
+  int Max[5];
+  bool detected[5];
+};
+
 class Lijnsensor {
 private:
   Zumo32U4LineSensors lineSensors;
 
   unsigned int sensorValues[5];
 
-  int blackValue[5];
-  int blackMin[5];
-  int blackMax[5];
 
-  int greenValue[5];
-  int greenMin[5];
-  int greenMax[5];
-
-  int brownValue[5];
-  int brownMin[5];
-  int brownMax[5];
-
-  int grayValue[5];
-  int grayMin[5];
-  int grayMax[5];
+  sensordata blacksensors;
+  sensordata greensensors;
+  sensordata graysensors;
+  sensordata brownsensors;
 
   /* TO DO array voor kleuren 
   int color_Value[5][4];
@@ -31,7 +28,7 @@ private:
 
   long totaal = 0;
 
- void calibreer(bool debug, int waarde_min[5], int waarde_max[5]);
+  void calibreer(bool debug, int waarde_min[5], int waarde_max[5]);
 
 public:
   Lijnsensor();
@@ -41,6 +38,8 @@ public:
   void calibrateGreen(bool debug);
   void calibrateBrown(bool debug);
   void calibrateGray(bool debug);
+  bool GreyDetected();
+  bool BlackDetected();
   void read(bool debug);
   void read(bool debug, int sensorNr);
   String bepaalRichting();
