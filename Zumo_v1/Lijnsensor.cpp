@@ -3,7 +3,7 @@
 #include "XbeeControl.h"
 
 Lijnsensor::Lijnsensor() {}
-Zumo32U4Motors motors;
+//Zumo32U4Motors motors;
 
 void Lijnsensor::init() {
   lineSensors.initFiveSensors();
@@ -67,6 +67,8 @@ void Lijnsensor::calibrateWhite(bool debug) {
 
 void Lijnsensor::calibrateBlack(bool debug) {
   lineSensors.calibrate();
+  //lineSensors.read(unsigned int *sensor_values)
+  //lineSensors.readLine(unsigned int *sensor_values)
 
   lineSensors.readCalibrated(sensorValues);
   for (int i = 0; i < 5; i++) {
@@ -397,10 +399,10 @@ void Lijnsensor::read(bool debug, int sensorNr) {
 
   if (zwartGedetecteerd) {
     Serial1.println(">>> ZWARTE LIJN GEDETECTEERD");
-    motors.setSpeedss(200, 200);
+   // motors.setSpeeds(200, 200);
   } else if (groenGedetecteerd) {
     Serial1.println(">>> GROENE LIJN GEDETECTEERD");
-    motors.setSpeedss(100, 100);
+    //motors.setSpeeds(100, 100);
   }
 
   else if (grijsGedetecteerd) {
@@ -412,4 +414,47 @@ void Lijnsensor::read(bool debug, int sensorNr) {
   Serial1.println("--------------------");
   delay(100);
 }
-*/
+
+
+
+
+ 
+
+// String Lijnsensor::bepaalRichting() {
+//   return "richting";
+  //TODO richting vastellen afhankelijk van gebruikte positie sensor
+
+
+  char Lijnsensor::bepaalRichting() {
+
+  lineSensors.read(sensorValues);
+
+  bool s[5];
+
+  for (int i = 0; i < 5; i++) {
+
+    s[i] =
+      sensorValues[i] >= blackMin[i] &&
+      sensorValues[i] <= blackMax[i];
+  }
+
+  
+
+//rechtdoor
+  if (s[2] && !s[0] && !s[4]) {
+    return 'D';
+  }
+
+
+
+//Scherpe links
+  if (s[0] && s[1] && s[2]) {
+    return 'L';
+  }
+
+//Scherpe rechts
+  if (s[2] && s[3] && s[4]) {
+    return 'R';
+  }
+
+}
