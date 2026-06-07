@@ -67,6 +67,8 @@ void Lijnsensor::calibrateWhite(bool debug) {
 
 void Lijnsensor::calibrateBlack(bool debug) {
   lineSensors.calibrate();
+  //lineSensors.read(unsigned int *sensor_values)
+  //lineSensors.readLine(unsigned int *sensor_values)
 
   lineSensors.read(sensorValues);
   for (int i = 0; i < 5; i++) {
@@ -307,23 +309,14 @@ void Lijnsensor::read(bool debug, int sensorNr) {
       sensorValues[i] <= blackMax[i];
   }
 
-  // patroon:
-  // [0] [1] [2] [3] [4]
+  
 
 //rechtdoor
   if (s[2] && !s[0] && !s[4]) {
     return 'D';
   }
 
-//links
-  if (s[0] || s[1]) {
-    return 'A';
-  }
 
-//Rechts
-  if (s[3] || s[4]) {
-    return 'Z';
-  }
 
 //Scherpe links
   if (s[0] && s[1] && s[2]) {

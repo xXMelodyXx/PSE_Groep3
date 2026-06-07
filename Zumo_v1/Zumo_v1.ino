@@ -4,10 +4,12 @@
 
 #include <Zumo32U4.h>
 #include "XbeeControl.h"
+#include "Motoren.h"
 
 
 Zumo32U4ButtonC buttonC;
-Zumo32U4Motors motors;
+//Zumo32U4Motors motors;
+Motoren motors;
 
 Lijnsensor lijnsensor;
 XBeeControl xbee;
@@ -70,13 +72,13 @@ void loop() {
       motors.setSpeeds(200, 200);
       break;
 
-    case 'A':
-      motors.setSpeeds(50, 200);
-      break;
+    // case 'A':
+    //   motors.setSpeeds(50, 200);
+    //   break;
 
-    case 'Z':
-      motors.setSpeeds(200, 50);
-      break;
+    // case 'Z':
+    //   motors.setSpeeds(200, 50);
+    //   break;
 
     case 'L':
       motors.setSpeeds(0, 200);
