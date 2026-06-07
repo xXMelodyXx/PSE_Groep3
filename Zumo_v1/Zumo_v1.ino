@@ -9,10 +9,11 @@
 
 Zumo32U4ButtonC buttonC;
 //Zumo32U4Motors motors;
-Motoren motors;
+Motoren motoren;
 
 Lijnsensor lijnsensor;
-XBeeControl xbee;
+//Xbee xbee;
+
 
 void setup() {
   //calibreren van de benodigde kleuren
@@ -52,20 +53,17 @@ void setup() {
   while (buttonC.isPressed() == false) {}
   delay(1000);
   lijnsensor.calibrateGray(false);
-  xbee.begin();
+  //xbee.begin();
 }
 
 
 void loop() {
-  xbee.update();
-  lijnsensor.read(false, 2);
-  lijnsensor.read(false, 1);
-  lijnsensor.read(false, 3);
-  lijnsensor.read(false, 0);
-  lijnsensor.read(false, 4);
+ // xbee.update();
+  
 
-  char richting = lijnsensor.bepaalRichting();
+  //char richting = lijnsensor.bepaalRichting();
 
+/*
   switch (richting) {
 
     case 'D':
@@ -81,11 +79,11 @@ void loop() {
     //   break;
 
     case 'L':
-      motors.setSpeeds(0, 200);
+      motors.setSpeed(0, 200);
       break;
 
     case 'R':
-      motors.setSpeeds(200, 0);
+      motors.setSpeed(200, 0);
       break;
 
     // case "KRUISING":
@@ -93,6 +91,32 @@ void loop() {
     //   break;
   }
     
-  
+  */
+
+  int keuze = lijnsensor.bepaalRichting();
+
+  switch(keuze){
+
+    case 1: 
+      //SCHERPE LINKS
+      motoren.setSpeed(0, 200);
+
+
+
+    case 2:
+    //SCHERPE RECHTS
+      motoren.setSpeed(200, 0);
+
+
+
+    case 3:
+    //SCHUINE LINKS
+      motoren.setSpeed(50, 150); //Snelheid meot nog getest worden
+
+
+    case 4:
+    motoren.setSpeed(150, 50);
+  }
+
   
 }

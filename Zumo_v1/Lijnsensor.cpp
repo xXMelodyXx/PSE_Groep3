@@ -1,9 +1,11 @@
 #include "WString.h"
 #include "Lijnsensor.h"
 #include "XbeeControl.h"
+#include "Motoren.h"
 
 Lijnsensor::Lijnsensor() {}
 //Zumo32U4Motors motors;
+Motoren motors;
 
 void Lijnsensor::init() {
   lineSensors.initFiveSensors();
@@ -265,7 +267,7 @@ bool Lijnsensor::BlackDetected() {
     }
   }
   if (blacksensors.detected[0] && blacksensors.detected[1] && blacksensors.detected[2]) {
-    motors.setSpeeds(0, 100);
+    motors.setSpeed(0, 100);
   }
 }
 
@@ -298,21 +300,21 @@ bool Lijnsensor::GreyDetected() {
   }
   if ((graysensors.detected[0] || graysensors.detected[1]) && (graysensors.detected[3] || graysensors.detected[4])) {
     if ((blacksensors.detected[0] || blacksensors.detected[1]) && (blacksensors.detected[3] || blacksensors.detected[4])) {
-      motors.setSpeeds(0, 0);
+      motors.setSpeed(0, 0);
       delay(2000);
-      motors.setSpeeds(200, 200);
+      motors.setSpeed(200, 200);
     }
   }
 
   if (graysensors.detected[0] || graysensors.detected[1]) {
     if ((blacksensors.detected[0] || blacksensors.detected[1]) && (blacksensors.detected[3] || blacksensors.detected[4])) {
-      motors.setSpeeds(0, 100);
+      motors.setSpeed(0, 100);
     }
   }
 
   if (graysensors.detected[3] || graysensors.detected[4]) {
     if ((blacksensors.detected[0] || blacksensors.detected[1]) && (blacksensors.detected[3] || blacksensors.detected[4])) {
-      motors.setSpeeds(100, 0);
+      motors.setSpeed(100, 0);
     }
   }
 }
@@ -456,5 +458,34 @@ void Lijnsensor::read(bool debug, int sensorNr) {
   if (s[2] && s[3] && s[4]) {
     return 'R';
   }
+
+}
+
+*/
+
+int Lijnsensor :: bepaalRichting(){
+  unsigned int positie = lineSensors.readLine(sensorValues);
+
+  //SCherpe bocht LINKS, tussen S0 en S1 gemiddelde
+  if(positie < 500){
+    return 1;
+  }
+  //Scherpe bocht RECHTS, Dit is tussen sensor 3 en 4
+  if(positie >3500){
+    return 2;
+  }
+  //Schuine LINKS
+  if(positie < 1500){
+    return 3;
+  }
+  //schuine RECHTS
+  if(positie > 3000){
+    return 4;
+  }
+  else{
+    return 0;
+  }
+  
+
 
 }
