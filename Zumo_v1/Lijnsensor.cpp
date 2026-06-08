@@ -239,7 +239,7 @@ void Lijnsensor::calibrateBrown(bool debug) {
   }
 }
 
-bool Lijnsensor::BlackDetected() {
+void Lijnsensor::BlackDetected() {
   blacksensors.detected[0] = false;
   blacksensors.detected[1] = false;
   blacksensors.detected[2] = false;
@@ -266,12 +266,22 @@ bool Lijnsensor::BlackDetected() {
       }
     }
   }
+  if (!blacksensors.detected[0] && !blacksensors.detected[4] && blacksensors.detected[2]) {
+    motors.setSpeed(100, 100);
+  }
+
   if (blacksensors.detected[0] && blacksensors.detected[1] && blacksensors.detected[2]) {
     motors.setSpeed(0, 100);
   }
+
+  if (blacksensors.detected[4] && blacksensors.detected[3] && blacksensors.detected[2]) {
+    motors.setSpeed(100, 0);
+  } else {
+    return;
+  }
 }
 
-bool Lijnsensor::GreyDetected() {
+void Lijnsensor::GreyDetected() {
   graysensors.detected[0] = false;
   graysensors.detected[1] = false;
   graysensors.detected[2] = false;
@@ -422,7 +432,7 @@ void Lijnsensor::read(bool debug, int sensorNr) {
 
  
 
-// String Lijnsensor::bepaalRichting() {
+ String Lijnsensor::bepaalRichting() {
 //   return "richting";
   //TODO richting vastellen afhankelijk van gebruikte positie sensor
 
@@ -436,8 +446,8 @@ void Lijnsensor::read(bool debug, int sensorNr) {
   for (int i = 0; i < 5; i++) {
 
     s[i] =
-      sensorValues[i] >= blackMin[i] &&
-      sensorValues[i] <= blackMax[i];
+      sensorValues[i] >= blacksensors.Min[i] &&
+      sensorValues[i] <= blacksensors.Max[i];
   }
 
   
@@ -461,31 +471,35 @@ void Lijnsensor::read(bool debug, int sensorNr) {
 
 }
 
-*/
 
-int Lijnsensor :: bepaalRichting(){
+
+*/
+int Lijnsensor ::bepaalRichting() {
   unsigned int positie = lineSensors.readLine(sensorValues);
 
   //SCherpe bocht LINKS, tussen S0 en S1 gemiddelde
-  if(positie < 500){
+  if (blacksensors.detected[2]) {
+    return 0;
+  }
+  if (blacksensors.detected[0]) {
+    Serial1.println("SCHERPE LINKS");
     return 1;
   }
   //Scherpe bocht RECHTS, Dit is tussen sensor 3 en 4
-  if(positie >3500){
+  if (blacksensors.detected[4]) {
     return 2;
   }
+  /*
   //Schuine LINKS
-  if(positie < 1500){
+  if(blacksensors.detected[1] && blacksensors.detected[2]){
     return 3;
   }
   //schuine RECHTS
-  if(positie > 3000){
+ if(blacksensors.detected[2] && blacksensors.detected[3]){
     return 4;
   }
   else{
     return 0;
   }
-  
-
-
+  */
 }

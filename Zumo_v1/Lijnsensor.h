@@ -38,8 +38,8 @@ public:
   void calibrateGreen(bool debug);
   void calibrateBrown(bool debug);
   void calibrateGray(bool debug);
-  bool GreyDetected();
-  bool BlackDetected();
+  void GreyDetected();
+  void BlackDetected();
   void read(bool debug);
   void read(bool debug, int sensorNr);
   //char bepaalRichting();
