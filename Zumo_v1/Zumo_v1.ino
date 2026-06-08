@@ -69,9 +69,9 @@ void setup() {
 
 void loop() {
 
-
-  //lijnsensor.BlackDetected();
-
+  if (ButtonB.isPressed()) {
+    keuze = 10;
+  }
 
   //xbee.update();
 
@@ -114,10 +114,17 @@ void loop() {
       Serial1.println("case 4 : SCHUIN RECHTS");
       break;
 
-      
+    case 5:
+    //groene lijn  
+       motoren.setSpeed(100, 100);
+      Serial1.println("case  5: GROEN");
+      break;
+
+
     case 10:
-     motoren.stop();
-     Serial1.println("case 10: STOP");
+      motoren.stop();
+      delay(2000);
+      Serial1.println("case 10: STOP");
+
   }
 }
-

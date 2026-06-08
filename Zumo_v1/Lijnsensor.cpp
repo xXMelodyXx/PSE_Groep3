@@ -94,7 +94,6 @@ void Lijnsensor::calibrateGreen(bool debug) {
     Serial1.println(greensensors.Min[i]);
     Serial1.print("Green max: ");
     Serial1.println(greensensors.Max[i]);
-
   }
 }
 
@@ -173,129 +172,90 @@ void Lijnsensor::calibrateBrown(bool debug) {
     Serial1.println(brownsensors.Max[i]);
   }
 }
-//If grey detected statements hergebruiken, zwart aanpassen.
-/*
-void Lijnsensor::BlackDetected() {
-  lineSensors.readCalibrated(sensorValues);
-  blacksensors.detected[0] = false;
-  blacksensors.detected[1] = false;
-  blacksensors.detected[2] = false;
-  blacksensors.detected[3] = false;
-  blacksensors.detected[4] = false;
-  bool blackDetected = false;
+
+bool Lijnsensor::GrayDetected() {
   for (int i = 0; i < 5; i++) {
-    if (sensorValues[i] >= blacksensors.Min[i] && sensorValues[i] <= blacksensors.Max[i]) {
-      bool blackDetected = false;
-      if (sensorValues[i] == sensorValues[0]) {
-        blacksensors.detected[0] = true;
-        Serial1.println("S0 zwart");
-      }
-      if (sensorValues[i] == sensorValues[1]) {
-        blacksensors.detected[1] = true;
-        Serial1.println("S1 zwart");
-      }
-      if (sensorValues[i] == sensorValues[2]) {
-        blacksensors.detected[2] = true;
-        Serial1.println("S2 zwart");
-      }
-      if (sensorValues[i] == sensorValues[3]) {
-        blacksensors.detected[3] = true;
-        Serial1.println("S3 zwart");
-      }
-      if (sensorValues[i] == sensorValues[4]) {
-        blacksensors.detected[4] = true;
-        Serial1.println("S4 zwart");
-      } else {
-        Serial1.println("else");
-      }
-    }
+    graysensors.detected[i] = false;
   }
-  if (!blacksensors.detected[0] && !blacksensors.detected[4] && blacksensors.detected[2]) {
-    motors.setSpeed(100, 100);
-  }
-
-  if (blacksensors.detected[0] && blacksensors.detected[1] && blacksensors.detected[2]) {
-    motors.setSpeed(0, 100);
-  }
-
-  if (blacksensors.detected[4] && blacksensors.detected[3] && blacksensors.detected[2]) {
-    motors.setSpeed(100, 0);
-  } else {
-    motors.setSpeed(50, 50);
-  }
-}
-
-void Lijnsensor::GreyDetected() {
-  graysensors.detected[0] = false;
-  graysensors.detected[1] = false;
-  graysensors.detected[2] = false;
-  graysensors.detected[3] = false;
-  graysensors.detected[4] = false;
-  bool grayDetected = false;
   for (int i = 0; i < 5; i++) {
     if (sensorValues[i] >= graysensors.Min[i] && sensorValues[i] <= graysensors.Max[i]) {
-      bool greyDetected = false;
-      if (sensorValues[i] = sensorValues[0]) {
-        graysensors.detected[0] = true;
-      }
-      if (sensorValues[i] = sensorValues[1]) {
-        graysensors.detected[1] = true;
-      }
-      if (sensorValues[i] = sensorValues[2]) {
-        graysensors.detected[2] = true;
-      }
-      if (sensorValues[i] = sensorValues[3]) {
-        graysensors.detected[3] = true;
-      }
-      if (sensorValues[i] = sensorValues[4]) {
-        graysensors.detected[4] = true;
-      }
-    }
-  }
-  if ((graysensors.detected[0] || graysensors.detected[1]) && (graysensors.detected[3] || graysensors.detected[4])) {
-    if ((blacksensors.detected[0] || blacksensors.detected[1]) && (blacksensors.detected[3] || blacksensors.detected[4])) {
-      motors.setSpeed(0, 0);
-      delay(2000);
-      motors.setSpeed(200, 200);
+      graysensors.detected[i] = true;
+      return true;
     }
   }
 
-  if (graysensors.detected[0] || graysensors.detected[1]) {
-    if ((blacksensors.detected[0] || blacksensors.detected[1]) && (blacksensors.detected[3] || blacksensors.detected[4])) {
-      motors.setSpeed(0, 100);
-    }
+  //TODO: graypositie() maken waarin je  if graydetected aanroept return int
+  if (graysensors.detected[0] && graysensors.detected[4]) {
+    if (positie < 300) && positie > 2500) {
+        //case 10
+      }
   }
 
-  if (graysensors.detected[3] || graysensors.detected[4]) {
-    if ((blacksensors.detected[0] || blacksensors.detected[1]) && (blacksensors.detected[3] || blacksensors.detected[4])) {
-      motors.setSpeed(100, 0);
+  if (graysensors.detected[0]) {
+    if (positie < 300) && positie > 2500) {
+        //case 1
+      }
+  }
+
+  if (graysensors.detected[4]) {
+    if (positie < 300) && positie > 2500) {
+        //case 2
+      }
+  }
+}
+
+bool Lijnsensor::GreenDetected() {
+  for (int i = 0; i < 5; i++) {
+    greensensors.detected[i] = false;
+  }
+  for (int i = 0; i < 5; i++) {
+    if (sensorValues[i] >= greensensors.Min[i] && sensorValues[i] <= greensensors.Max[i]) {
+      greensensors.detected[i] = true;
+      return true;
     }
   }
 }
-*/
 
 
-int Lijnsensor::bepaalRichting2() {
-
-  unsigned int positie = lineSensors.readLine(sensorValues);
-
-  if (positie < 300) {
-    return 1;
+bool Lijnsensor::GreenDetected() {
+  for (int i = 0; i < 5; i++) {
+    greensensors.detected[i] = false;
+  }
+  for (int i = 0; i < 5; i++) {
+    if (sensorValues[i] >= greensensors.Min[i] && sensorValues[i] <= greensensors.Max[i]) {
+      greensensors.detected[i] = true;
+      return true;
+    }
   }
 
-  if (positie > 3700) {
-    return 2;
+
+  int Lijnsensor::bepaalRichting2() {
+
+    unsigned int positie = lineSensors.readLine(sensorValues);
+
+    if (positie < 300) {
+      return 1;
+    }
+
+    if (positie > 3700) {
+      return 2;
+    }
+
+    if (positie < 1500) {
+      return 3;
+    }
+
+    if (positie > 2500) {
+      return 4;
+    }
+
+    if (GreenDetected()) {
+      //bochten voor groen
+      return 5;
+    }
+    // if functie greypositie() == 10/1/2 dan case 10/1/2
+
+
+
+    return 0;
   }
-
-  if (positie < 1500) {
-    return 3;
-  }
-
-  if (positie > 2500) {
-    return 4;
-  }
-
-  return 0;
-}
-
-

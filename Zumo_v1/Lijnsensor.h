@@ -15,16 +15,11 @@ private:
   unsigned int sensorValues[5];
 
 
-  sensordata blacksensors;
+
   sensordata greensensors;
   sensordata graysensors;
   sensordata brownsensors;
 
-  /* TO DO array voor kleuren 
-  int color_Value[5][4];
-  int color_Min[5][4];
-  int color_Max[5][4];
-  */
 
   long totaal = 0;
 
@@ -38,8 +33,9 @@ public:
   void calibrateGreen(bool debug);
   void calibrateBrown(bool debug);
   void calibrateGray(bool debug);
-  void GreyDetected();
-  void BlackDetected();
+  bool GrayDetected();
+  bool GreenDetected();
+  bool BrownDetected();
   void read(bool debug);
   void read(bool debug, int sensorNr);
   //char bepaalRichting();
