@@ -44,4 +44,5 @@ public:
   void read(bool debug, int sensorNr);
   //char bepaalRichting();
   int bepaalRichting();
+  int bepaalRichting2();
 };
