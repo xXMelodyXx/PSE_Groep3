@@ -17,6 +17,7 @@ private:
 
   unsigned int sensorValues[5];
   int positie;
+  
 
   sensordata greensensors;
   sensordata graysensors;

@@ -11,7 +11,9 @@ Motoren motors;
 //Helling helling;
 
 void Lijnsensor::init() {
+  helling.start();
   lineSensors.initFiveSensors();
+  
   for (int i = 0; i < 5; i++) {
     blacksensors.Value[i] = 0;
     blacksensors.Min[i] = 0;
@@ -191,19 +193,19 @@ int Lijnsensor::GrayPosition(int positie) {
   if (GrayDetected()) {
     if (graysensors.detected[0] && graysensors.detected[4]) {
       // evt. delay als hij te snel positie herkent
-      if (positie < 300 && positie > 2500) {
+      if (positie < 300 || positie > 2500) {
           return 10;
         }
     }
 
     if (graysensors.detected[0]) {
-      if (positie < 300 && positie > 2500) {
+      if (positie < 300 || positie > 2500) { //heb && replaced met ||
           return 1;
         }
     }
 
     if (graysensors.detected[4]) {
-      if (positie < 300 && positie > 2500) {
+      if (positie < 300 || positie > 2500) {
           return 2;
         }
     }
@@ -265,7 +267,21 @@ int Lijnsensor::BrownPosition(int positie) {
  * return int voor het switchen van de cases in main
  */
 int Lijnsensor::bepaalRichting() {
+
   int positie = lineSensors.readLine(sensorValues);
+
+
+    if (buttonB.isPressed()) {
+    return 11;
+  }
+
+  if (helling.hellingGedetecteerd()) {
+    return 7;
+    
+  }
+
+
+  
 
   if ((positie < 300) || (GreenPosition(positie) == 1) || (GrayPosition(positie) == 1)) {
     return 1;
@@ -283,26 +299,20 @@ int Lijnsensor::bepaalRichting() {
     return 4;
   }
 
-  if (GreenPosition(positie) == 5) {
-    return 5;
-  }
+  // if (GreenPosition(positie) == 5) {
+  //   return 5;
+  // }
 
   if (BrownPosition(positie) == 6) {
     return 6;
   }
-  if(helling.hellingGedetecteerd()){
-
-    return 7;
-
-  }
+  
 
   if (GrayPosition(positie) == 10) {
     return 10;
   }
 
-  if (buttonB.isPressed()) {
-    return 11;
-  }
+
 
   return 0;
 }

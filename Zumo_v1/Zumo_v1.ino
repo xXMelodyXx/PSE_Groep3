@@ -11,9 +11,8 @@
 Zumo32U4ButtonC buttonC;
 Zumo32U4ButtonA buttonA;
 //Zumo32U4ButtonB buttonB;
-//Zumo32U4Motors motors;
 Motoren motoren;
-Helling helling;
+//Helling helling;
 
 Lijnsensor lijnsensor;
 //Xbee xbee;
@@ -23,8 +22,9 @@ void setup() {
   //calibreren van de benodigde kleuren
   //Serial1.begin(9600);
   Serial1.begin(9600);
-  Serial1.println("test");
   delay(2000);
+ // helling.start();
+  Serial1.println("Helling geinit");
   lijnsensor.init();
   Serial1.println("Leg de ZUMO op WIT");
   Serial1.println("Druk op knop C om te starten");
@@ -79,6 +79,11 @@ void loop() {
 
   int keuze = lijnsensor.bepaalRichting();
 
+  // static int vorigeKeuze = -1;  
+  // if (keuze != vorigeKeuze) {
+  //   Serial1.println(keuze);  
+  //   vorigeKeuze = keuze;
+  // }
 
 
   switch (keuze) {
@@ -114,11 +119,11 @@ void loop() {
       Serial1.println("case 4 : SCHUIN RECHTS");
       break;
 
-    case 5:
-      //groene lijn
-      motoren.setSpeed(100, 100);
-      Serial1.println("case  5: GROEN");
-      break;
+    // case 5:
+    //   //groene lijn
+    //   motoren.setSpeed(100, 100);
+    //   Serial1.println("case  5: GROEN");
+    //   break;
 
     case 6:
       //bruine lijn
@@ -127,7 +132,7 @@ void loop() {
     case 7:
       motoren.setSpeed(300,300);
       Serial1.println("case 7: HOEK GRADEN ");
-      Serial1.print(helling.geefHoek());\
+      Serial1.print(helling.geefHoek());
       break;
 
     case 10:
@@ -140,7 +145,11 @@ void loop() {
     case 11:
       //stoppen als op knop B gedrukt.
       motoren.stop();
-      Serial1.println("case 11: STOP");
+      while(buttonA.isPressed() == false){
+        motoren.stop();
+        delay(1000);
+      }
+      
       break;
   }
 }
