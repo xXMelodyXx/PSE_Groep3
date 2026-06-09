@@ -28,6 +28,53 @@ void Lijnsensor :: simpelCalibreer(){
   lineSensors.calibrate();
 }
 
+sensordata Lijnsensor::calibreer(bool debug, int waarde_min[5], int waarde_max[5]) {
+  lineSensors.calibrate();
+  // bool debug gebruikt om onnodige data outprint te beperken en overzichterlijker te maken
+  lineSensors.read(sensorValues);
+  int gem_waarde[5];
+  for (int i = 0; i < 5; i++) {
+    waarde_min[i] = sensorValues[i];
+    waarde_max[i] = sensorValues[i];
+
+    totaal = 0;
+
+    for (int j = 0; j < 40; j++) {
+      lineSensors.read(sensorValues);
+
+      totaal += sensorValues[i];
+      if (debug == true) {
+        Serial.println(sensorValues[i]);
+      }
+      if (sensorValues[i] < waarde_min[i]) {
+        waarde_min[i] = sensorValues[j];
+      }
+      if (sensorValues[i] > waarde_max[i]) {
+        waarde_max[i] = sensorValues[j];
+      }
+      delay(5);
+    }
+
+    // OPTIE TODO if statements dichtsbijzijnde kleur plaats van tolerantie
+    gem_waarde[i] = totaal / 40;
+    waarde_min[i] = waarde_min[i] * 0.5;
+    waarde_max[i] = waarde_max[i] * 1.5;
+    //tolerantie +/- 120 tijdens testen
+    //in plaats van plus x factor doen
+    Serial.println("KALIBRATIE KLAAR");
+    Serial.print("Gemiddelde: ");
+    Serial.println(gem_waarde[i]);
+    Serial.print("Minimum: ");
+    Serial.println(waarde_min[i]);
+    Serial.print("Maximum: ");
+    Serial.println(waarde_max[i]);
+  }
+}
+
+void Lijnsensor::calibrateGreen(bool debug) {
+  calibreer(debug, greenMin, greenMax);
+}
+
 
 void Lijnsensor::calibrateWhite(bool debug) {
   lineSensors.calibrate();
@@ -69,6 +116,7 @@ void Lijnsensor::calibrateBlack(bool debug) {
   }
 }
 
+/*
 void Lijnsensor::calibrateGreen(bool debug) {
   lineSensors.calibrate();
 
@@ -102,7 +150,7 @@ void Lijnsensor::calibrateGreen(bool debug) {
     Serial1.println(greensensors.Max[i]);
   }
 }
-
+*/
 
 void Lijnsensor::calibrateGray(bool debug) {
   lineSensors.calibrate();

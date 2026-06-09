@@ -19,7 +19,7 @@ const int MIN_SPEED  = 0;     // minimale motorsnelheid
 // Pas deze drie waarden aan tijdens testen:
 const float KP = 0.25;   // Proportioneel  – reageert op huidige fout
 const float KI = 0.0;    // Integraal      – compenseert aanhoudende fout
-const float KD = 1.5;    // Differentieel  – dempt overshoot/slingeren
+//const float KD = 1.5;    // Differentieel  – dempt overshoot/slingeren
 // ─────────────────────────────────────────────────
 
 // PID variabelen
