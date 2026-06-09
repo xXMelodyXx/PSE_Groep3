@@ -1,9 +1,10 @@
 #include <Wire.h>
 
 #include "Lijnsensor.h"
+#include "Helling.h"
 
 #include <Zumo32U4.h>
-#include "XbeeControl.h"
+//#include "XbeeControlv2.h"
 #include "Motoren.h"
 
 
@@ -12,6 +13,7 @@ Zumo32U4ButtonA buttonA;
 //Zumo32U4ButtonB buttonB;
 //Zumo32U4Motors motors;
 Motoren motoren;
+Helling helling;
 
 Lijnsensor lijnsensor;
 //Xbee xbee;
@@ -122,6 +124,11 @@ void loop() {
       //bruine lijn
       break;
 
+    case 7:
+      motoren.setSpeed(300,300);
+      Serial1.println("case 7: HOEK GRADEN ");
+      Serial1.print(helling.geefHoek());\
+      break;
 
     case 10:
       //stoppen voor 2 sec

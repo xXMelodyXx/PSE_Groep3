@@ -3,10 +3,12 @@
 #include "Lijnsensor.h"
 #include "XbeeControl.h"
 #include "Motoren.h"
+//#include "Helling.h"
 
 Lijnsensor::Lijnsensor() {}
 
 Motoren motors;
+//Helling helling;
 
 void Lijnsensor::init() {
   lineSensors.initFiveSensors();
@@ -287,6 +289,11 @@ int Lijnsensor::bepaalRichting() {
 
   if (BrownPosition(positie) == 6) {
     return 6;
+  }
+  if(helling.hellingGedetecteerd()){
+
+    return 7;
+
   }
 
   if (GrayPosition(positie) == 10) {

@@ -1,5 +1,6 @@
 #include <Wire.h>
 #include <Zumo32U4.h>
+#include "Helling.h"
 
 struct sensordata {
   int Value[5];
@@ -11,6 +12,7 @@ struct sensordata {
 class Lijnsensor {
 private:
   Zumo32U4LineSensors lineSensors;
+  Helling helling;
   Zumo32U4ButtonB buttonB;
 
   unsigned int sensorValues[5];
