@@ -9,6 +9,7 @@
 
 Zumo32U4ButtonC buttonC;
 Zumo32U4ButtonA buttonA;
+//Zumo32U4ButtonB buttonB;
 //Zumo32U4Motors motors;
 Motoren motoren;
 
@@ -69,14 +70,14 @@ void setup() {
 
 void loop() {
 
-  if (ButtonB.isPressed()) {
-    keuze = 10;
-  }
+  
 
   //xbee.update();
 
 
   int keuze = lijnsensor.bepaalRichting2();
+
+  
 
   switch (keuze) {
 

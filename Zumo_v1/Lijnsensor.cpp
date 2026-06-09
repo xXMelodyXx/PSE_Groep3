@@ -185,23 +185,24 @@ bool Lijnsensor::GrayDetected() {
   }
 
   //TODO: graypositie() maken waarin je  if graydetected aanroept return int
-  if (graysensors.detected[0] && graysensors.detected[4]) {
-    if (positie < 300) && positie > 2500) {
-        //case 10
-      }
-  }
 
-  if (graysensors.detected[0]) {
-    if (positie < 300) && positie > 2500) {
-        //case 1
-      }
-  }
+  // if (graysensors.detected[0] && graysensors.detected[4]) {
+  //   //if (positie < 300) && positie > 2500) {
+  //       //case 10
+  //     }
+  // }
 
-  if (graysensors.detected[4]) {
-    if (positie < 300) && positie > 2500) {
-        //case 2
-      }
-  }
+  // if (graysensors.detected[0]) {
+  //   //if (positie < 300) && positie > 2500) {
+  //       //case 1
+  //     }
+  // }
+
+  // if (graysensors.detected[4]) {
+  //  // if (positie < 300) && positie > 2500) {
+  //       //case 2
+  //     }
+  // }
 }
 
 bool Lijnsensor::GreenDetected() {
@@ -216,7 +217,7 @@ bool Lijnsensor::GreenDetected() {
   }
 }
 
-
+/*
 bool Lijnsensor::GreenDetected() {
   for (int i = 0; i < 5; i++) {
     greensensors.detected[i] = false;
@@ -227,7 +228,7 @@ bool Lijnsensor::GreenDetected() {
       return true;
     }
   }
-
+*/
 
   int Lijnsensor::bepaalRichting2() {
 
@@ -254,6 +255,10 @@ bool Lijnsensor::GreenDetected() {
       return 5;
     }
     // if functie greypositie() == 10/1/2 dan case 10/1/2
+
+    if(buttonB.isPressed()){
+      return 10;
+    }
 
 
 

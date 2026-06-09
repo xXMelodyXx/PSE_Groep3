@@ -11,6 +11,7 @@ struct sensordata {
 class Lijnsensor {
 private:
   Zumo32U4LineSensors lineSensors;
+  Zumo32U4ButtonB buttonB;
 
   unsigned int sensorValues[5];
 
@@ -19,6 +20,8 @@ private:
   sensordata greensensors;
   sensordata graysensors;
   sensordata brownsensors;
+
+  sensordata blacksensors;
 
 
   long totaal = 0;
