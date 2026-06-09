@@ -259,6 +259,9 @@ int Lijnsensor::BrownPosition(int positie) {
   }
 }
 
+/**
+ * return int voor het switchen van de cases in main
+ */
 int Lijnsensor::bepaalRichting() {
   int positie = lineSensors.readLine(sensorValues);
 
