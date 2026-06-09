@@ -70,19 +70,20 @@ void setup() {
 
 void loop() {
 
-  
+
 
   //xbee.update();
 
 
-  int keuze = lijnsensor.bepaalRichting2();
+  int keuze = lijnsensor.bepaalRichting();
 
-  
+
 
   switch (keuze) {
 
     case 0:
-      motoren.setSpeed(300, 300);
+      //rechtdoor
+      motoren.setSpeed(200, 200);
       Serial1.println("case 0 : RECHTDOOR");
       break;
 
@@ -92,40 +93,47 @@ void loop() {
       Serial1.println("case 1 : SCHERP LINKS");
       break;
 
-
-
     case 2:
       //SCHERPE RECHTS
       motoren.setSpeed(200, 0);
       Serial1.println("case 2 : SCHERP RECHTS");
       break;
 
-
-
     case 3:
       //SCHUINE LINKS
-      motoren.setSpeed(50, 300);
+      motoren.setSpeed(50, 200);
       Serial1.println("case 3 : SCHUIN LINKS");
       break;
 
 
     case 4:
       //SCHUINE RECHTS
-      motoren.setSpeed(300, 50);
+      motoren.setSpeed(200, 50);
       Serial1.println("case 4 : SCHUIN RECHTS");
       break;
 
     case 5:
-    //groene lijn  
-       motoren.setSpeed(100, 100);
+      //groene lijn
+      motoren.setSpeed(100, 100);
       Serial1.println("case  5: GROEN");
+      break;
+
+    case 6:
+      //bruine lijn
       break;
 
 
     case 10:
+      //stoppen voor 2 sec
       motoren.stop();
       delay(2000);
-      Serial1.println("case 10: STOP");
+      Serial1.println("case 10: STOP 2 SEC");
+      break;
 
+    case 11:
+      //stoppen als op knop B gedrukt.
+      motoren.stop();
+      Serial1.println("case 11: STOP");
+      break;
   }
 }

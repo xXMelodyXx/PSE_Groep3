@@ -14,8 +14,7 @@ private:
   Zumo32U4ButtonB buttonB;
 
   unsigned int sensorValues[5];
-
-
+  int positie;
 
   sensordata greensensors;
   sensordata graysensors;
@@ -39,9 +38,10 @@ public:
   bool GrayDetected();
   bool GreenDetected();
   bool BrownDetected();
+  int GrayPosition(int positie);
+  int GreenPosition(int positie);
+  int BrownPosition(int positie);
   void read(bool debug);
   void read(bool debug, int sensorNr);
-  //char bepaalRichting();
   int bepaalRichting();
-  int bepaalRichting2();
 };
