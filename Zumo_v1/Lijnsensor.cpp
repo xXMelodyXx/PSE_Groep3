@@ -1,271 +1,298 @@
+#include "HardwareSerial.h"
 #include "WString.h"
 #include "Lijnsensor.h"
 #include "XbeeControl.h"
+#include "Motoren.h"
 
 Lijnsensor::Lijnsensor() {}
-Zumo32U4Motors motors;
+
+Motoren motors;
 
 void Lijnsensor::init() {
   lineSensors.initFiveSensors();
   for (int i = 0; i < 5; i++) {
-    blackValue[i] = 0;
-    blackMin[i] = 0;
-    blackMax[i] = 0;
+    blacksensors.Value[i] = 0;
+    blacksensors.Min[i] = 0;
+    blacksensors.Max[i] = 0;
 
-    greenValue[i] = 0;
-    greenMin[i] = 0;
-    greenMax[i] = 0;
+    greensensors.Value[i] = 0;
+    greensensors.Min[i] = 0;
+    greensensors.Max[i] = 0;
   }
 }
 
-void Lijnsensor::calibreer(bool debug, int waarde_min[5], int waarde_max[5]) {
-  lineSensors.calibrate();
-  // bool debug gebruikt om onnodige data outprint te beperken en overzichterlijker te maken
-  lineSensors.read(sensorValues);
-  int gem_waarde[5];
-  for (int i = 0; i < 5; i++) {
-    waarde_min[i] = sensorValues[i];
-    waarde_max[i] = sensorValues[i];
 
-    totaal = 0;
-
-    for (int j = 0; j < 40; j++) {
-      lineSensors.read(sensorValues);
-
-      totaal += sensorValues[i];
-      if (debug == true) {
-        Serial1.println(sensorValues[i]);
-      }
-      if (sensorValues[i] < waarde_min[i]) {
-        waarde_min[i] = sensorValues[i];
-      }
-      if (sensorValues[i] > waarde_max[i]) {
-        waarde_max[i] = sensorValues[i];
-      }
-      delay(5);
-    }
-
-    // OPTIE TODO if statements dichtsbijzijnde kleur plaats van tolerantie
-    gem_waarde[i] = totaal / 40;
-    waarde_min[i] = waarde_min[i] - 30;
-    waarde_max[i] = waarde_max[i] + 30;
-    //tolerantie +/- 120 tijdens testen
-    Serial1.println("KALIBRATIE KLAAR");
-    Serial1.print("Gemiddelde: ");
-    Serial1.println(gem_waarde[i]);
-    Serial1.print("Minimum: ");
-    Serial1.println(waarde_min[i]);
-    Serial1.print("Maximum: ");
-    Serial1.println(waarde_max[i]);
-  }
-}
 
 void Lijnsensor::calibrateWhite(bool debug) {
   lineSensors.calibrate();
 }
-/*
-void Lijnsensor::calibrateBlack(bool debug) {
-  calibreer(debug, blackMin, blackMax);
-}
-*/
 
 void Lijnsensor::calibrateBlack(bool debug) {
   lineSensors.calibrate();
 
-  lineSensors.read(sensorValues);
+  lineSensors.readCalibrated(sensorValues);
   for (int i = 0; i < 5; i++) {
-    blackMin[i] = sensorValues[i];
-    blackMax[i] = sensorValues[i];
+    blacksensors.Min[i] = sensorValues[i];
+    blacksensors.Max[i] = sensorValues[i];
 
     totaal = 0;
 
     for (int j = 0; j < 40; j++) {
-      lineSensors.read(sensorValues);
+      lineSensors.readCalibrated(sensorValues);
 
       totaal += sensorValues[i];
       if (debug == true) {
         Serial1.println(sensorValues[i]);
       }
-      if (sensorValues[i] < blackMin[i]) {
-        blackMin[i] = sensorValues[i];
+      if (sensorValues[i] < blacksensors.Min[i]) {
+        blacksensors.Min[i] = sensorValues[i];
       }
-      if (sensorValues[i] > blackMax[i]) {
-        blackMax[i] = sensorValues[i];
+      if (sensorValues[i] > blacksensors.Max[i]) {
+        blacksensors.Max[i] = sensorValues[i];
       }
       delay(5);
     }
-
-
-
-    // OPTIE TODO if statements dichtsbijzijnde kleur plaats van tolerantie
-    blackValue[i] = totaal / 40;
-    blackMin[i] = blackMin[i] - 30;
-    blackMax[i] = blackMax[i] + 30;
 
     Serial1.println("ZWART KALIBRATIE KLAAR");
     Serial1.print("zwartwaarde: ");
-    Serial1.println(blackValue[i]);
+    Serial1.println(blacksensors.Value[i]);
     Serial1.print("Zwart min: ");
-    Serial1.println(blackMin[i]);
+    Serial1.println(blacksensors.Min[i]);
     Serial1.print("Zwart max: ");
-    Serial1.println(blackMax[i]);
+    Serial1.println(blacksensors.Max[i]);
   }
 }
 
-/*
 void Lijnsensor::calibrateGreen(bool debug) {
-  calibreer(debug, greenMin, greenMax);
-}
-*/
+  lineSensors.calibrate();
 
-void Lijnsensor::calibrateGreen(bool debug) {
-  lineSensors.read(sensorValues);
+  lineSensors.readCalibrated(sensorValues);
   for (int i = 0; i < 5; i++) {
-    greenMin[i] = sensorValues[i];
-    greenMax[i] = sensorValues[i];
+    greensensors.Min[i] = sensorValues[i];
+    greensensors.Max[i] = sensorValues[i];
 
     totaal = 0;
     for (int j = 0; j < 40; j++) {
-      lineSensors.read(sensorValues);
+      lineSensors.readCalibrated(sensorValues);
       totaal += sensorValues[i];
       if (debug == true) {
         Serial1.println(sensorValues[i]);
       }
-      if (sensorValues[i] < greenMin[i]) {
-        greenMin[i] = sensorValues[j];
+      if (sensorValues[i] < greensensors.Min[i]) {
+        greensensors.Min[i] = sensorValues[i];
       }
-      if (sensorValues[i] > greenMax[i]) {
-        greenMax[i] = sensorValues[j];
+      if (sensorValues[i] > greensensors.Max[i]) {
+        greensensors.Max[i] = sensorValues[i];
       }
       delay(5);
     }
 
-    greenValue[i] = totaal / 40;
-    greenMin[i] = greenMin[i] - 30;
-    greenMax[i] = greenMax[i] + 30;
-
     Serial1.println("GREEN KALIBRATIE KLAAR");
     Serial1.print("greenwaarde: ");
-    Serial1.println(greenValue[i]);
+    Serial1.println(greensensors.Value[i]);
     Serial1.print("Green min: ");
-    Serial1.println(greenMin[i]);
+    Serial1.println(greensensors.Min[i]);
     Serial1.print("Green max: ");
-    Serial1.println(greenMax[i]);
-    
-    //TODO voor grijs & bruin
+    Serial1.println(greensensors.Max[i]);
   }
 }
-
-/*
-void Lijnsensor::calibrateBrown(bool debug) {
-  calibreer(debug, brownMin, brownMax);
-  //calibreer(debug, color_Min[0], color_Max[0]);
-}
-*/
 
 
 void Lijnsensor::calibrateGray(bool debug) {
-  calibreer(debug, grayMin, grayMax);
+  lineSensors.calibrate();
+
+  lineSensors.readCalibrated(sensorValues);
+  for (int i = 0; i < 5; i++) {
+    graysensors.Min[i] = sensorValues[i];
+    graysensors.Max[i] = sensorValues[i];
+
+    totaal = 0;
+    for (int j = 0; j < 40; j++) {
+      lineSensors.readCalibrated(sensorValues);
+      totaal += sensorValues[i];
+      if (debug == true) {
+        Serial1.println(sensorValues[i]);
+      }
+      if (sensorValues[i] < graysensors.Min[i]) {
+        graysensors.Min[i] = sensorValues[i];
+      }
+      if (sensorValues[i] > graysensors.Max[i]) {
+        graysensors.Max[i] = sensorValues[i];
+      }
+      delay(5);
+    }
+
+    Serial1.println("GRAY KALIBRATIE KLAAR");
+    Serial1.print("graywaarde: ");
+    Serial1.println(graysensors.Value[i]);
+    Serial1.print("Gray min: ");
+    Serial1.println(graysensors.Min[i]);
+    Serial1.print("Gray max: ");
+    Serial1.println(graysensors.Max[i]);
+  }
 }
 
-/*
-void Lijnsensor::read(bool debug) {
-  lineSensors.read(sensorValues);
+void Lijnsensor::calibrateBrown(bool debug) {
+  lineSensors.calibrate();
 
-  bool zwartGedetecteerd = false;
-  bool groenGedetecteerd = false;
-  bool grijsGedetecteerd = false;
-  if (debug == true) {
-    for (int i = 0; i < 5; i++) {
-      int waarde = sensorValues[i];
+  lineSensors.readCalibrated(sensorValues);
+  for (int i = 0; i < 5; i++) {
+    brownsensors.Min[i] = sensorValues[i];
+    brownsensors.Max[i] = sensorValues[i];
 
-      Serial1.print("Sensor ");
-      Serial1.print(i);
-      Serial1.print(": ");
-      Serial1.println(waarde);
+    totaal = 0;
+    for (int j = 0; j < 40; j++) {
+      lineSensors.readCalibrated(sensorValues);
+      totaal += sensorValues[i];
+      if (debug == true) {
+        Serial1.println(sensorValues[i]);
+      }
+      if (sensorValues[i] < brownsensors.Min[i]) {
+        brownsensors.Min[i] = sensorValues[i];
+      }
+      if (sensorValues[i] > brownsensors.Max[i]) {
+        brownsensors.Max[i] = sensorValues[i];
+      }
+      delay(5);
     }
-  }
-  if (sensorValues[2] >= blackMin[2] && sensorValues[2] <= blackMax[2]) {
-    zwartGedetecteerd = true;
-  }
+    //correctie comment optie
+    /*
+    brownsensors.Value[i] = totaal / 40;
+    brownsensors.Min[i] = brownsensors.Min[i] - 30;
+    brownsensors.Max[i] = brownsensors.Max[i] + 30;
+     */
+    //readcalibrated toegevoegd die kijkt naar 0 tot 30
 
-  if (sensorValues[2] >= greenMin[2] && sensorValues[2] <= greenMax[2]) {
-    groenGedetecteerd = true;
+    Serial1.println("BROWN KALIBRATIE KLAAR");
+    Serial1.print("Brown waarde: ");
+    Serial1.println(brownsensors.Value[i]);
+    Serial1.print("Brown min: ");
+    Serial1.println(brownsensors.Min[i]);
+    Serial1.print("Brown max: ");
+    Serial1.println(brownsensors.Max[i]);
   }
-  if (sensorValues[2] >= grijsGedetecteerd[2] && sensorValues[2] <= grijsGedetecteerd[2]) {
-    grijsGedetecteerd = true;
-  }
-//geen grijs en bruin nog toegevoegd
-  if (zwartGedetecteerd) {
-    Serial1.println(">>> ZWARTE LIJN GEDETECTEERD");
-  } 
-  else if (groenGedetecteerd) {
-    Serial1.println(">>> GROENE LIJN GEDETECTEERD");
-  }
-
-  else if(grijsGedetecteerd){
-      Serial1.println("GRIJZE LIJN GEDETECTEERD");
-    }
-   else {
-    Serial1.println(">>> GEEN LIJN");
-  }
-
-  Serial1.println("--------------------");
-  delay(100);
-  // TODO voor sensor 1, 3, 0, 4
-  // TODO (if) left, center, right
-  // TODO grijs eerst volgende kruising een bocht die kant op
-  // TODO bruin stoppen
-}
-*/
-
-void Lijnsensor::read(bool debug, int sensorNr) {
-  lineSensors.read(sensorValues);
-
-  bool zwartGedetecteerd = false;
-  bool groenGedetecteerd = false;
-  bool grijsGedetecteerd = false;
-  if (debug == true) {
-
-    int waarde = sensorValues[sensorNr];
-
-    Serial1.print("Sensor ");
-    Serial1.print(sensorNr);
-    Serial1.print(": ");
-    Serial1.println(waarde);
-  }
-  if (sensorValues[sensorNr] >= blackMin[sensorNr] && sensorValues[sensorNr] <= blackMax[sensorNr]) {
-    zwartGedetecteerd = true;
-  }
-
-  if (sensorValues[sensorNr] >= greenMin[sensorNr] && sensorValues[sensorNr] <= greenMax[sensorNr]) {
-    groenGedetecteerd = true;
-  }
-
-  if (sensorValues[sensorNr] >= grayMin[sensorNr] && sensorValues[sensorNr] <= grayMax[sensorNr]) {
-    grijsGedetecteerd = true;
-  }
-
-  if (zwartGedetecteerd) {
-    Serial1.println(">>> ZWARTE LIJN GEDETECTEERD");
-    motors.setSpeeds(200,200);
-  } else if (groenGedetecteerd) {
-    Serial1.println(">>> GROENE LIJN GEDETECTEERD");
-    motors.setSpeeds(100,100);
-  }
-
-    else if (grijsGedetecteerd){
-      Serial1.println(">>> GRIJZE LIJN GEDETECTEERD");
-    }
-   else {
-    Serial1.println(">>> GEEN LIJN");
-  }
-
-  Serial1.println("--------------------");
-  delay(100);
 }
 
-String Lijnsensor::bepaalRichting() {
-  return "richting";
-  //TODO richting vastellen afhankelijk van gebruikte positie sensor
+bool Lijnsensor::GrayDetected() {
+  for (int i = 0; i < 5; i++) {
+    graysensors.detected[i] = false;
+  }
+  for (int i = 0; i < 5; i++) {
+    if (sensorValues[i] >= graysensors.Min[i] && sensorValues[i] <= graysensors.Max[i]) {
+      graysensors.detected[i] = true;
+      return true;
+    }
+  }
+}
+
+int Lijnsensor::GrayPosition(int positie) {
+  if (GrayDetected()) {
+    if (graysensors.detected[0] && graysensors.detected[4]) {
+      // evt. delay als hij te snel positie herkent
+      if (positie < 300 && positie > 2500) {
+          return 10;
+        }
+    }
+
+    if (graysensors.detected[0]) {
+      if (positie < 300 && positie > 2500) {
+          return 1;
+        }
+    }
+
+    if (graysensors.detected[4]) {
+      if (positie < 300 && positie > 2500) {
+          return 2;
+        }
+    }
+  }
+}
+
+bool Lijnsensor::GreenDetected() {
+  for (int i = 0; i < 5; i++) {
+    greensensors.detected[i] = false;
+  }
+  for (int i = 0; i < 5; i++) {
+    if (sensorValues[i] >= greensensors.Min[i] && sensorValues[i] <= greensensors.Max[i]) {
+      greensensors.detected[i] = true;
+      return true;
+    }
+  }
+}
+
+// als er teveel afwijking is graysensors.detected[1] & graysensors.detected[3] toevoegen
+int Lijnsensor::GreenPosition(int positie) {
+  if (GreenDetected()) {
+    if (greensensors.detected[0]) {
+      return 1;
+    }
+
+    if (greensensors.detected[4]) {
+      return 2;
+    }
+
+    if ((greensensors.detected[2]) && (!greensensors.detected[0]) && (!greensensors.detected[4])) {
+      return 5;
+    }
+  }
+}
+
+bool Lijnsensor::BrownDetected() {
+  for (int i = 0; i < 5; i++) {
+    brownsensors.detected[i] = false;
+  }
+  for (int i = 0; i < 5; i++) {
+    if (sensorValues[i] >= brownsensors.Min[i] && sensorValues[i] <= brownsensors.Max[i]) {
+      brownsensors.detected[i] = true;
+      return true;
+    }
+  }
+}
+
+// eventueel uit proberen zonder BrownPosition alleen met Bool naar Bepaalrichting
+// Staat nu extra erin voor extra nauwkeurigheid
+int Lijnsensor::BrownPosition(int positie) {
+  if (BrownDetected()) {
+    if (brownsensors.detected[0] && brownsensors.detected[4]) {
+      return 6;
+    }
+  }
+}
+
+int Lijnsensor::bepaalRichting() {
+  int positie = lineSensors.readLine(sensorValues);
+
+  if ((positie < 300) || (GreenPosition(positie) == 1) || (GrayPosition(positie) == 1)) {
+    return 1;
+  }
+
+  if ((positie > 3700) || (GrayPosition(positie) == 2)) {
+    return 2;
+  }
+
+  if (positie < 1500) {
+    return 3;
+  }
+
+  if (positie > 2500) {
+    return 4;
+  }
+
+  if (GreenPosition(positie) == 5) {
+    return 5;
+  }
+
+  if (BrownPosition(positie) == 6) {
+    return 6;
+  }
+
+  if (GrayPosition(positie) == 10) {
+    return 10;
+  }
+
+  if (buttonB.isPressed()) {
+    return 11;
+  }
+
+  return 0;
 }
