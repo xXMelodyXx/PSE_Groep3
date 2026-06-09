@@ -2,6 +2,7 @@
 #define MOTOREN_H
 
 #include <Zumo32U4.h>
+#include "Lijnsensor.h"
 
 /*!
   @class Motoren
@@ -13,13 +14,14 @@ private:
 
   Zumo32U4Motors motors;
   Zumo32U4Encoders encoders;
+  Lijnsensor* lijnsensor;
 
 public:
 
   /*!
     @brief Constructor van de Motoren klasse.
   */
-  Motoren();
+  Motoren(Lijnsensor*);
 
   /*!
     @brief Zet snelheid van beide motoren.
@@ -48,6 +50,8 @@ public:
     @brief Reset beide encoders.
   */
   void resetEncoders();
+
+  void initialiseer();
 };
 
 #endif

@@ -1,3 +1,6 @@
+#ifndef LIJNSENSOR_H
+#define LIJNSENSOR_H
+
 #include <Wire.h>
 #include <Zumo32U4.h>
 #include "Helling.h"
@@ -38,6 +41,7 @@ public:
   void calibrateGreen(bool debug);
   void calibrateBrown(bool debug);
   void calibrateGray(bool debug);
+  void simpelCalibreer();
   bool GrayDetected();
   bool GreenDetected();
   bool BrownDetected();
@@ -47,4 +51,7 @@ public:
   void read(bool debug);
   void read(bool debug, int sensorNr);
   int bepaalRichting();
+  int getPositie();
 };
+
+#endif

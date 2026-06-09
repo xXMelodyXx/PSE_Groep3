@@ -7,7 +7,6 @@
 
 Lijnsensor::Lijnsensor() {}
 
-Motoren motors;
 //Helling helling;
 
 void Lijnsensor::init() {
@@ -25,6 +24,9 @@ void Lijnsensor::init() {
   }
 }
 
+void Lijnsensor :: simpelCalibreer(){
+  lineSensors.calibrate();
+}
 
 
 void Lijnsensor::calibrateWhite(bool debug) {
@@ -218,6 +220,7 @@ bool Lijnsensor::GreenDetected() {
   }
   for (int i = 0; i < 5; i++) {
     if (sensorValues[i] >= greensensors.Min[i] && sensorValues[i] <= greensensors.Max[i]) {
+      Serial1.println("GROEN IS GEDETECTEERD");
       greensensors.detected[i] = true;
       return true;
     }
@@ -263,12 +266,16 @@ int Lijnsensor::BrownPosition(int positie) {
   }
 }
 
+int Lijnsensor::getPositie() {
+  return lineSensors.readLine(sensorValues);
+}
+
 /**
  * return int voor het switchen van de cases in main
  */
 int Lijnsensor::bepaalRichting() {
 
-  int positie = lineSensors.readLine(sensorValues);
+  positie = lineSensors.readLine(sensorValues);
 
 
     if (buttonB.isPressed()) {

@@ -19,9 +19,6 @@ private:
 
     float beginHoek;
     float huidigeHoek;
-
-
-
     float berekenHoek();
 };
 

@@ -1,51 +1,58 @@
 #include <Wire.h>
-
 #include "Lijnsensor.h"
 #include "Helling.h"
-
 #include <Zumo32U4.h>
-//#include "XbeeControlv2.h"
 #include "Motoren.h"
-
 
 Zumo32U4ButtonC buttonC;
 Zumo32U4ButtonA buttonA;
-//Zumo32U4ButtonB buttonB;
-Motoren motoren;
-//Helling helling;
 
 Lijnsensor lijnsensor;
-//Xbee xbee;
+Motoren motoren(&lijnsensor);
 
+
+//── PID instellingen ──────────────────────────────
+const int BASE_SPEED = 200;   // basissnelheid
+const int MAX_SPEED  = 400;   // maximale motorsnelheid
+const int MIN_SPEED  = 0;     // minimale motorsnelheid
+
+// Pas deze drie waarden aan tijdens testen:
+const float KP = 0.25;   // Proportioneel  – reageert op huidige fout
+const float KI = 0.0;    // Integraal      – compenseert aanhoudende fout
+const float KD = 1.5;    // Differentieel  – dempt overshoot/slingeren
+// ─────────────────────────────────────────────────
+
+// PID variabelen
+float prevError   = 0;
+float integral    = 0;
 
 void setup() {
-  //calibreren van de benodigde kleuren
-  //Serial1.begin(9600);
   Serial1.begin(9600);
   delay(2000);
- // helling.start();
-  Serial1.println("Helling geinit");
   lijnsensor.init();
+
+  Serial1.println("STARTEN MET SIMPEL CALIBRATIE");
+  Serial1.println("Duk op knop C");
+  while(buttonC.isPressed() == false){}
+  motoren.initialiseer();
+
   Serial1.println("Leg de ZUMO op WIT");
   Serial1.println("Druk op knop C om te starten");
   while (buttonC.isPressed() == false) {}
   delay(1000);
   lijnsensor.calibrateWhite(false);
-  Serial1.println("--------------------------------");
+
   Serial1.println("Leg de ZUMO op ZWART");
   Serial1.println("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
   lijnsensor.calibrateBlack(false);
 
-  Serial1.println("zwart gescand");
   Serial1.println("Leg de ZUMO op Groen");
   Serial1.println("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
   lijnsensor.calibrateGreen(false);
-
-  Serial1.println("groen gescand");
 
   Serial1.println("Leg de ZUMO op Bruin");
   Serial1.println("Druk op knop C om te scannen");
@@ -53,103 +60,120 @@ void setup() {
   delay(1000);
   lijnsensor.calibrateBrown(false);
 
-  Serial1.println("bruin gescand");
   Serial1.println("Leg de ZUMO op Grijs");
   Serial1.println("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
   lijnsensor.calibrateGray(false);
 
-  Serial1.println("grijs gescand");
-
-  Serial1.println("wait for button A");
+  Serial1.println("Druk op knop A om te starten!");
   buttonA.waitForButton();
-  Serial1.println("start!");
+  Serial1.println("Start!");
+}
 
-  //xbee.begin();
+
+void rijdenMetPID() {
+  int positie = lijnsensor.getPositie();  
+
+  float error = positie - 2000;
+  integral += error;
+  integral = constrain(integral, -5000, 5000);
+
+  // Afgeleide
+  // float derivative = error - prevError;
+  // prevError = error;
+
+  // PID correctie
+  float correctie = (KP * error) + (KI * integral);
+
+  // Motorsnelheden berekenen
+  int linksSnelheid  = constrain((int)(BASE_SPEED + correctie), MIN_SPEED, MAX_SPEED);
+  int rechtsSnelheid = constrain((int)(BASE_SPEED - correctie), MIN_SPEED, MAX_SPEED);
+
+  motoren.setSpeed(linksSnelheid, rechtsSnelheid);
 }
 
 
 void loop() {
-
-
-
-  //xbee.update();
-
-
   int keuze = lijnsensor.bepaalRichting();
 
-  // static int vorigeKeuze = -1;  
+  // static int vorigeKeuze = -1;
   // if (keuze != vorigeKeuze) {
-  //   Serial1.println(keuze);  
   //   vorigeKeuze = keuze;
   // }
-
 
   switch (keuze) {
 
     case 0:
-      //rechtdoor
-      motoren.setSpeed(200, 200);
-      Serial1.println("case 0 : RECHTDOOR");
+      // Rechtdoor met PID
+      rijdenMetPID();
+      Serial1.println("CASE 0: RECHTDOOR ");
+      
+
       break;
 
     case 1:
-      //SCHERPE LINKS
+      // Scherp links
+      integral = 0;  // reset integraal bij bocht
       motoren.setSpeed(0, 200);
-      Serial1.println("case 1 : SCHERP LINKS");
+      Serial1.println("CASE 1: SCHERP LINKS");
       break;
 
     case 2:
-      //SCHERPE RECHTS
+      
+      integral = 0;
       motoren.setSpeed(200, 0);
-      Serial1.println("case 2 : SCHERP RECHTS");
+       Serial1.println("CASE 2: SCHERP RECHTS");
       break;
 
     case 3:
-      //SCHUINE LINKS
-      motoren.setSpeed(50, 200);
-      Serial1.println("case 3 : SCHUIN LINKS");
+    
+      rijdenMetPID();
+       Serial1.println("CASE 3: SCHUIN LINKS");
       break;
-
 
     case 4:
-      //SCHUINE RECHTS
-      motoren.setSpeed(200, 50);
-      Serial1.println("case 4 : SCHUIN RECHTS");
+     
+      rijdenMetPID();
+       Serial1.println("CASE 4: SCHUIN RECHTS");
       break;
 
-    // case 5:
-    //   //groene lijn
-    //   motoren.setSpeed(100, 100);
-    //   Serial1.println("case  5: GROEN");
+    case 5:
+      // Groene lijn
+      integral = 0;
+      motoren.setSpeed(100, 100);
+      Serial1.println("CASE 5: GROEN");
+      break;
+
+    // case 6:
+    //   // Bruine lijn
+    //   integral = 0;
+    //   motoren.stop();
     //   break;
 
-    case 6:
-      //bruine lijn
-      break;
-
     case 7:
-      motoren.setSpeed(300,300);
-      Serial1.println("case 7: HOEK GRADEN ");
-      Serial1.print(helling.geefHoek());
+      // Helling – rechtdoor zonder PID (lijn is minder betrouwbaar)
+      integral = 0;
+      motoren.setSpeed(250, 250);
+       Serial1.println("CASE 7: HELLING GEDETECTEERD ");
       break;
 
     case 10:
-      //stoppen voor 2 sec
-      motoren.stop();
+      // Stop 2 seconden
+      integral = 0;
+      //motoren.stop();
       delay(2000);
-      Serial1.println("case 10: STOP 2 SEC");
       break;
 
     case 11:
-      //stoppen als op knop B gedrukt.
+      // Stop totdat knop A ingedrukt wordt
+      integral = 0;
       motoren.stop();
-      while(buttonA.isPressed() == false){
+      while (buttonA.isPressed() == false) {
         motoren.stop();
-        delay(1000);
+        delay(50);
       }
-      
+      Serial1.println("Hervat!");
       break;
   }
 }
