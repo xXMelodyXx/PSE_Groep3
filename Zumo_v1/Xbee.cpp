@@ -13,6 +13,10 @@ void Xbee::begin() {
   Serial1.begin(9600);
 }
 
+void Xbee::print(String text){
+    Serial1.println(text);
+}
+
 void Xbee::update() {
 
   // Controleer of data beschikbaar is
