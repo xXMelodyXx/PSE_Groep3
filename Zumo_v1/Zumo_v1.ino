@@ -12,6 +12,7 @@ Zumo32U4ButtonA buttonA;
 Xbee xb;
 Lijnsensor lijnsensor(&xb);
 Motoren motoren(&lijnsensor);
+Motoren motors;
 
 
 //── PID instellingen ──────────────────────────────
@@ -34,19 +35,19 @@ void setup() {
   delay(2000);
   lijnsensor.init();
 
-  Serial1.println("STARTEN MET SIMPEL CALIBRATIE");
-  Serial1.println("Duk op knop C");
+  xb.print("STARTEN MET SIMPEL CALIBRATIE");
+  xb.print("Duk op knop C");
   while(buttonC.isPressed() == false){}
   motoren.initialiseer();
 
-  Serial1.println("Leg de ZUMO op WIT");
-  Serial1.println("Druk op knop C om te starten");
+  xb.print("Leg de ZUMO op WIT");
+  xb.print("Druk op knop C om te starten");
   while (buttonC.isPressed() == false) {}
   delay(1000);
-  lijnsensor.calibrateWhite(false);
+  lijnsensor.calibrateWhite();
 
-  Serial1.println("Leg de ZUMO op ZWART");
-  Serial1.println("Druk op knop C om te scannen");
+  xb.print("Leg de ZUMO op ZWART");
+  xb.print("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
   lijnsensor.calibrateBlack();
@@ -93,8 +94,6 @@ void rijdenMetPID() {
   // Afgeleide
   // float derivative = error - prevError;
   // prevError = error;
-
-  // PID correctie
   float correctie = (KP * error) + (KI * integral);
 
   // Motorsnelheden berekenen
@@ -117,7 +116,7 @@ void loop() {
 
     case 0:
       //rechtdoor
-      motoren.setSpeed(200, 200);
+      //motoren.setSpeed(200, 200);
       xb.print("case 0 : RECHTDOOR");
       // Rechtdoor met PID
       rijdenMetPID();
@@ -129,26 +128,30 @@ void loop() {
     case 1:
       // Scherp links
       integral = 0;  // reset integraal bij bocht
-      motoren.setSpeed(0, 200);
+      //motoren.setSpeed(0, 200);
+      rijdenMetPID();
       xb.print("case 1 : SCHERP LINKS");
       break;
 
     case 2:
       
       integral = 0;
-      motoren.setSpeed(200, 0);
+      //motoren.setSpeed(200, 0);
+      rijdenMetPID();
       xb.print("case 2 : SCHERP RECHTS");
       break;
 
     case 3:
       //SCHUINE LINKS
-      motoren.setSpeed(50, 200);
+      //motoren.setSpeed(50, 200);
+      rijdenMetPID();
       xb.print("case 3 : SCHUIN LINKS");
       break;
 
     case 4:
       //SCHUINE RECHTS
-      motoren.setSpeed(200, 50);
+      //motoren.setSpeed(200, 50);
+      rijdenMetPID();
       xb.print("case 4 : SCHUIN RECHTS");
       break;
 

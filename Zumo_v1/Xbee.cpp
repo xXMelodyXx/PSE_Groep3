@@ -1,3 +1,4 @@
+#include "WString.h"
 #include "Xbee.h"
 #include <ctype.h>
 
@@ -56,6 +57,10 @@ bool Xbee::knopC() {
 
   return cKnop.getSingleDebouncedPress();
 }
+
+// void Xbee::print(String text){
+//     Serial1.println(text);
+// }
 
 char Xbee::getCommand() {
 

@@ -24,6 +24,33 @@ void Lijnsensor::init() {
 
 sensordata Lijnsensor::getGemiddelde(int hoeveelMetingen) {
   sensordata resultaat;
+  lineSensors.readCalibrated(sensorValues);
+  long totaal[NMRSENSOR];
+  for (int i = 0; i < NMRSENSOR; i++) {
+    totaal[i] += sensorValues[i];
+    resultaat.Min[i] = sensorValues[i];
+    resultaat.Max[i] = sensorValues[i];
+  }
+  for (int i = 0; i < hoeveelMetingen; i++) {
+    lineSensors.readCalibrated(sensorValues);
+    for (int j = 0; j < NMRSENSOR; j++) {
+      totaal[j] += sensorValues[j];
+    for (int j = 0; j < NMRSENSOR; j++) {
+      totaal[j] += sensorValues[j];
+      if (sensorValues[j] < resultaat.Min[j]) {
+        resultaat.Min[i] = sensorValues[j];
+      }
+      if (sensorValues[j] > resultaat.Max[j]) {
+        resultaat.Max[j] = sensorValues[j];
+      }
+    }
+  }
+  for (int i = 0; i < NMRSENSOR; i++) {
+    resultaat.Gemiddelde[i] = totaal[i] / (hoeveelMetingen + 1);
+  }
+  return resultaat;
+}
+
 void Lijnsensor ::simpelCalibreer() {
   lineSensors.calibrate();
 }
@@ -71,16 +98,9 @@ sensordata Lijnsensor::calibreer(bool debug, int waarde_min[5], int waarde_max[5
   }
 }
 */
+
+
 /*
-void Lijnsensor::calibrateGreen(bool debug) {
-  calibreer(debug, greenMin, greenMax);
-}
-*/
-
-void Lijnsensor::calibrateWhite(bool debug) {
-  lineSensors.calibrate();
-}
-
 void Lijnsensor::calibrateBlack(bool debug) {
   lineSensors.calibrate();
 
@@ -108,7 +128,7 @@ void Lijnsensor::calibrateBlack(bool debug) {
   }
   return resultaat;
 }
-
+*/
 sensordata Lijnsensor::calibreer(String kleur) {
   sensordata resultaat = getGemiddelde(100);
   for (int i = 0; i < NMRSENSOR; i++) {
@@ -119,9 +139,7 @@ sensordata Lijnsensor::calibreer(String kleur) {
   }
   return resultaat;
 }
-/*
-void Lijnsensor::calibrateGreen(bool debug) {
-  lineSensors.calibrate();
+
 
 int Lijnsensor::leesPositie() {
   if (BlackDetected() || GreenDetected()) {
@@ -288,8 +306,6 @@ int Lijnsensor::bepaalRichting() {
   if (helling.hellingGedetecteerd()) {
     return 7;
   }
-
-  if()
 
   if ((positie < 300) || (GreenPosition(positie) == 1) || (GrayPosition(positie) == 1)) {
     return 1;

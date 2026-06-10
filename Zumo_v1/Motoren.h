@@ -21,7 +21,7 @@ public:
   /*!
     @brief Constructor van de Motoren klasse.
   */
-  Motoren(Lijnsensor*);
+  Motoren(Lijnsensor* l);
   Motoren();
 
   /*!

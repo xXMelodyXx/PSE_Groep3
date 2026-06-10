@@ -37,7 +37,7 @@ private:
   Xbee* xb;
 
 public:
-  Lijnsensor(Xbee*);
+  Lijnsensor(Xbee* xbee);
   void init();
   void calibrateWhite();
   void calibrateBlack();
