@@ -1,13 +1,16 @@
 #include <Wire.h>
 #include "Lijnsensor.h"
-#include "Helling.h"
 #include <Zumo32U4.h>
+#include "Xbee.h"
 #include "Motoren.h"
+
+
 
 Zumo32U4ButtonC buttonC;
 Zumo32U4ButtonA buttonA;
 
-Lijnsensor lijnsensor;
+Xbee xb;
+Lijnsensor lijnsensor(&xb);
 Motoren motoren(&lijnsensor);
 
 
@@ -46,29 +49,37 @@ void setup() {
   Serial1.println("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
-  lijnsensor.calibrateBlack(false);
+  lijnsensor.calibrateBlack();
 
-  Serial1.println("Leg de ZUMO op Groen");
-  Serial1.println("Druk op knop C om te scannen");
+  xb.print("zwart gescand");
+  xb.print("Leg de ZUMO op Groen");
+  xb.print("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
-  //lijnsensor.calibrateGreen(false);
+  lijnsensor.calibrateGreen();
 
-  Serial1.println("Leg de ZUMO op Bruin");
-  Serial1.println("Druk op knop C om te scannen");
+  xb.print("groen gescand");
+
+  xb.print("Leg de ZUMO op Bruin");
+  xb.print("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
-  lijnsensor.calibrateBrown(false);
+  lijnsensor.calibrateBrown();
 
-  Serial1.println("Leg de ZUMO op Grijs");
-  Serial1.println("Druk op knop C om te scannen");
+  xb.print("bruin gescand");
+  xb.print("Leg de ZUMO op Grijs");
+  xb.print("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
-  lijnsensor.calibrateGray(false);
+  lijnsensor.calibrateGray();
 
-  Serial1.println("Druk op knop A om te starten!");
+  xb.print("grijs gescand");
+
+  xb.print("wait for button A");
   buttonA.waitForButton();
-  Serial1.println("Start!");
+  xb.print("start!");
+
+  //xbee.begin();
 }
 
 
@@ -105,9 +116,12 @@ void loop() {
   switch (keuze) {
 
     case 0:
+      //rechtdoor
+      motoren.setSpeed(200, 200);
+      xb.print("case 0 : RECHTDOOR");
       // Rechtdoor met PID
       rijdenMetPID();
-      Serial1.println("CASE 0: RECHTDOOR ");
+     
       
 
       break;
@@ -116,33 +130,33 @@ void loop() {
       // Scherp links
       integral = 0;  // reset integraal bij bocht
       motoren.setSpeed(0, 200);
-      Serial1.println("CASE 1: SCHERP LINKS");
+      xb.print("case 1 : SCHERP LINKS");
       break;
 
     case 2:
       
       integral = 0;
       motoren.setSpeed(200, 0);
-       Serial1.println("CASE 2: SCHERP RECHTS");
+      xb.print("case 2 : SCHERP RECHTS");
       break;
 
     case 3:
-    
-      rijdenMetPID();
-       Serial1.println("CASE 3: SCHUIN LINKS");
+      //SCHUINE LINKS
+      motoren.setSpeed(50, 200);
+      xb.print("case 3 : SCHUIN LINKS");
       break;
 
     case 4:
-     
-      rijdenMetPID();
-       Serial1.println("CASE 4: SCHUIN RECHTS");
+      //SCHUINE RECHTS
+      motoren.setSpeed(200, 50);
+      xb.print("case 4 : SCHUIN RECHTS");
       break;
 
     case 5:
       // Groene lijn
       integral = 0;
       motoren.setSpeed(100, 100);
-      Serial1.println("CASE 5: GROEN");
+      xb.print("case  5: GROEN");
       break;
 
     // case 6:
@@ -164,12 +178,14 @@ void loop() {
       integral = 0;
       //motoren.stop();
       delay(2000);
+      xb.print("case 10: STOP 2 SEC");
       break;
 
     case 11:
       // Stop totdat knop A ingedrukt wordt
       integral = 0;
       motoren.stop();
+      xb.print("case 11: STOP");
       while (buttonA.isPressed() == false) {
         motoren.stop();
         delay(50);
