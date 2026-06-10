@@ -11,45 +11,34 @@
 
 #include <Zumo32U4.h>
 
-/*!
-  @class XBeeControl
-  @brief Klasse voor XBee communicatie en motorbesturing.
-*/
 class XBeeControl {
 
   private:
 
-    /*!
-      @brief Motorobject van de Zumo robot.
-    */
+    // Motorobject van de Zumo robot
     Zumo32U4Motors motors;
 
-    /*!
-      @brief Laatst ontvangen commando.
-    */
+    // Laatst ontvangen commando
     char command;
 
-    /*!
-      @brief Tijdstip van het laatste ontvangen commando.
-    */
+    // Tijdstip van laatste commando
     unsigned long lastCommandTime;
+
 
   public:
 
-    /*!
-      @brief Constructor van de klasse XBeeControl.
-    */
     XBeeControl();
 
-    /*!
-      @brief Initialiseert de seriële communicatie.
-    */
     void begin();
 
-    /*!
-      @brief Verwerkt XBee input en bestuurt de robot.
-    */
     void update();
+
+    /*!
+      @brief Laat de robot rijden op basis van een commando.
+       toets Letter van het toetsenbord (W, A, S, D, X)
+    */
+    void rijden(char toets);
+
 };
 
 #endif
