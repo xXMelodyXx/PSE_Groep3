@@ -1,8 +1,8 @@
-goede lijnsensor.cpp #include "Lijnsensor.h"
+#include "Lijnsensor.h"
 #define NMRSENSOR 5
 
-Lijnsensor::Lijnsensor(Xbee* xbee)
-  : xb(xbee) {}
+Lijnsensor::Lijnsensor(Xbee* xbee, ProximityBlok* p)
+  : xb(xbee), proximityBlok(p) {}
 
 Motoren motors;
 
