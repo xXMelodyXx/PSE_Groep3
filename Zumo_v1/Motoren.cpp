@@ -2,6 +2,7 @@
 
 Motoren::Motoren(Lijnsensor* l) : lijnsensor(l){
 }
+Motoren:: Motoren();
 
 void Motoren::setSpeed(int links, int rechts) {
 

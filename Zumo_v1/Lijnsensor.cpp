@@ -11,8 +11,9 @@ Lijnsensor::Lijnsensor() {}
 
 void Lijnsensor::init() {
   helling.start();
+  proximityBlok.init();
   lineSensors.initFiveSensors();
-  
+
   for (int i = 0; i < 5; i++) {
     blacksensors.Value[i] = 0;
     blacksensors.Min[i] = 0;
@@ -24,10 +25,10 @@ void Lijnsensor::init() {
   }
 }
 
-void Lijnsensor :: simpelCalibreer(){
+void Lijnsensor ::simpelCalibreer() {
   lineSensors.calibrate();
 }
-
+/*
 sensordata Lijnsensor::calibreer(bool debug, int waarde_min[5], int waarde_max[5]) {
   lineSensors.calibrate();
   // bool debug gebruikt om onnodige data outprint te beperken en overzichterlijker te maken
@@ -70,11 +71,12 @@ sensordata Lijnsensor::calibreer(bool debug, int waarde_min[5], int waarde_max[5
     Serial.println(waarde_max[i]);
   }
 }
-
+*/
+/*
 void Lijnsensor::calibrateGreen(bool debug) {
   calibreer(debug, greenMin, greenMax);
 }
-
+*/
 
 void Lijnsensor::calibrateWhite(bool debug) {
   lineSensors.calibrate();
@@ -244,20 +246,20 @@ int Lijnsensor::GrayPosition(int positie) {
     if (graysensors.detected[0] && graysensors.detected[4]) {
       // evt. delay als hij te snel positie herkent
       if (positie < 300 || positie > 2500) {
-          return 10;
-        }
+        return 10;
+      }
     }
 
     if (graysensors.detected[0]) {
-      if (positie < 300 || positie > 2500) { //heb && replaced met ||
-          return 1;
-        }
+      if (positie < 300 || positie > 2500) {  //heb && replaced met ||
+        return 1;
+      }
     }
 
     if (graysensors.detected[4]) {
       if (positie < 300 || positie > 2500) {
-          return 2;
-        }
+        return 2;
+      }
     }
   }
 }
@@ -326,17 +328,15 @@ int Lijnsensor::bepaalRichting() {
   positie = lineSensors.readLine(sensorValues);
 
 
-    if (buttonB.isPressed()) {
+  if (buttonB.isPressed()) {
     return 11;
   }
 
   if (helling.hellingGedetecteerd()) {
     return 7;
-    
   }
 
-
-  
+  if()
 
   if ((positie < 300) || (GreenPosition(positie) == 1) || (GrayPosition(positie) == 1)) {
     return 1;
@@ -361,7 +361,7 @@ int Lijnsensor::bepaalRichting() {
   if (BrownPosition(positie) == 6) {
     return 6;
   }
-  
+
 
   if (GrayPosition(positie) == 10) {
     return 10;

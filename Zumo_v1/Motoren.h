@@ -22,6 +22,7 @@ public:
     @brief Constructor van de Motoren klasse.
   */
   Motoren(Lijnsensor*);
+  Motoren();
 
   /*!
     @brief Zet snelheid van beide motoren.

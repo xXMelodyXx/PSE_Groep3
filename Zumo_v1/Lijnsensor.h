@@ -4,7 +4,7 @@
 #include <Wire.h>
 #include <Zumo32U4.h>
 #include "Helling.h"
-
+#include "ProximityBlok.h"
 struct sensordata {
   int Value[5];
   int Min[5];
@@ -16,6 +16,7 @@ class Lijnsensor {
 private:
   Zumo32U4LineSensors lineSensors;
   Helling helling;
+  ProximityBlok proximityBlok;
   Zumo32U4ButtonB buttonB;
 
   unsigned int sensorValues[5];

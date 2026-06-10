@@ -52,7 +52,7 @@ void setup() {
   Serial1.println("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
-  lijnsensor.calibrateGreen(false);
+  //lijnsensor.calibrateGreen(false);
 
   Serial1.println("Leg de ZUMO op Bruin");
   Serial1.println("Druk op knop C om te scannen");
@@ -158,6 +158,7 @@ void loop() {
        Serial1.println("CASE 7: HELLING GEDETECTEERD ");
       break;
 
+
     case 10:
       // Stop 2 seconden
       integral = 0;
@@ -175,5 +176,8 @@ void loop() {
       }
       Serial1.println("Hervat!");
       break;
+
+    case 12: 
+      
   }
 }
