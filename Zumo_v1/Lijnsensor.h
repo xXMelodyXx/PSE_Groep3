@@ -23,7 +23,7 @@ private:
   sensordata graysensors;
   sensordata brownsensors;
   sensordata blacksensors;
-  sensordata calibreer();
+  sensordata calibreer(String kleur);
   int hoeveelMetingen;
   Xbee* xb;
 
@@ -35,6 +35,7 @@ public:
   void calibrateGreen();
   void calibrateBrown();
   void calibrateGray();
+  int leesPositie();
   sensordata getGemiddelde(int hoeveelMetingen);
   bool GrayDetected();
   bool GreenDetected();
@@ -43,7 +44,5 @@ public:
   int GrayPosition(int positie);
   int GreenPosition(int positie);
   int BrownPosition(int positie);
-  void read(bool debug);
-  void read(bool debug, int sensorNr);
   int bepaalRichting();
 };

@@ -1,5 +1,5 @@
-
 #include "Lijnsensor.h"
+#define NMRSENSOR 5
 
 Lijnsensor::Lijnsensor(Xbee* xbee)
   : xb(xbee) {}
@@ -19,8 +19,6 @@ void Lijnsensor::init() {
   }
 }
 
-//TODO: kalibreer functie terug erinstoppen en aanroepen per kleur
-
 sensordata Lijnsensor::getGemiddelde(int hoeveelMetingen) {
   sensordata resultaat;
   lineSensors.readCalibrated(sensorValues);
@@ -32,8 +30,8 @@ sensordata Lijnsensor::getGemiddelde(int hoeveelMetingen) {
   }
   for (int i = 0; i < hoeveelMetingen; i++) {
     lineSensors.readCalibrated(sensorValues);
-    for (int j = 0; j < NMRSENSORS; j++) {
-      totaal[j] += seensorValues[j];
+    for (int j = 0; j < NMRSENSOR; j++) {
+      totaal[j] += sensorValues[j];
       if (sensorValues[j] < resultaat.Min[j]) {
         resultaat.Min[i] = sensorValues[j];
       }
@@ -46,42 +44,62 @@ sensordata Lijnsensor::getGemiddelde(int hoeveelMetingen) {
     resultaat.Gemiddelde[i] = totaal[i] / (hoeveelMetingen + 1);
   }
   return resultaat;
-
-sensordata Lijnsensor::calibreer(string kleur) {
-  sensordata resultaat =  getGemiddelde(100);
-  xb->print("kleur "+ kleur + "aan het kalibreren.");
-
-  xb->print("Gemiddelde: " + resultaat.Gemiddelde[i]);
-
-  xb->print("Minimum: "resultaat.Min[i]);
-
-  xb->print("Maximum: "resultaat.Max[i]);
-
 }
 
+sensordata Lijnsensor::calibreer(String kleur) {
+  sensordata resultaat = getGemiddelde(100);
+  for (int i = 0; i < NMRSENSOR; i++) {
+    xb->print("kleur " + kleur + "aan het kalibreren.");
+    xb->print("Gemiddelde: " + resultaat.Gemiddelde[i]);
+    xb->print("Minimum: " + resultaat.Min[i]);
+    xb->print("Maximum: " + resultaat.Max[i]);
+  }
+  return resultaat;
+}
+
+int Lijnsensor::leesPositie() {
+  if (BlackDetected() || GreenDetected()) {
+    sensordata gemiddeldeMeting = getGemiddelde(3);
+    long totaal = 0;
+    long gewogenGemiddelde = 0;
+    for (int i = 0; i < NMRSENSOR; i++) {
+      totaal += gemiddeldeMeting.Gemiddelde[i];                                       // alle gemiddelden van alle sensoren opgeteld
+      gewogenGemiddelde += (long)gemiddeldeMeting.Gemiddelde[i] * ((i + 1) * 1000L);  // +1 want *0 = 0.
+    }
+    if (totaal <= 0) {
+      return -1;
+    }
+    return gewogenGemiddelde / totaal;  //
+  }
+}
+//TODO: toepassing in motoren.cpp
 
 void Lijnsensor::calibrateWhite() {
   calibreer("wit");
 }
 
 void Lijnsensor::calibrateBlack() {
-  sensordata blacksensors calibreer("zwart");
-  //TODO: correctie toevoegen met factor
+  calibreer("zwart");
+  //TODO: correctie/drempelwaarde toevoegen met factor
+  //TODO: sensordata blacksensors opslaan
 }
 
 void Lijnsensor::calibrateGreen() {
   calibreer("groen");
-  //TODO: correctie toevoegen met factor
+  //TODO: correctie/drempelwaarde toevoegen met factor
+  //TODO: sensordata greensensors opslaan
 }
 
 void Lijnsensor::calibrateGray() {
   calibreer("grijs");
-  //TODO: correctie toevoegen met factor
+  //TODO: correctie/drempelwaarde toevoegen met factor
+  //TODO: sensordata greysensors opslaan
 }
 
 void Lijnsensor::calibrateBrown() {
   calibreer("bruin");
-  //TODO: correctie toevoegen met factor
+  //TODO: correctie/drempelwaarde toevoegen met factor
+  //TODO: sensordata brownsensors opslaan
 }
 
 bool Lijnsensor::BlackDetected() {
@@ -183,8 +201,7 @@ int Lijnsensor::BrownPosition(int positie) {
   }
 }
 
-int Lijnsensor::leesPositie() {
-}
+
 
 
 int Lijnsensor::bepaalRichting() {

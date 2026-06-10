@@ -13,7 +13,7 @@ void Xbee::begin() {
   Serial1.begin(9600);
 }
 
-void Xbee::print(string text){
+void Xbee::print(String text){
     Serial1.println(text);
 }
 

@@ -1,10 +1,9 @@
 #include <Wire.h>
-
 #include "Lijnsensor.h"
-
 #include <Zumo32U4.h>
-#include "XbeeControl.h"
+#include "Xbee.h"
 #include "Motoren.h"
+
 
 
 Zumo32U4ButtonC buttonC;
@@ -28,20 +27,20 @@ void setup() {
   xb.print("Druk op knop C om te starten");
   while (buttonC.isPressed() == false) {}
   delay(1000);
-  lijnsensor.calibrateWhite(false);
+  lijnsensor.calibrateWhite();
   xb.print("--------------------------------");
   xb.print("Leg de ZUMO op ZWART");
   xb.print("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
-  lijnsensor.calibrateBlack(false);
+  lijnsensor.calibrateBlack();
 
   xb.print("zwart gescand");
   xb.print("Leg de ZUMO op Groen");
   xb.print("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
-  lijnsensor.calibrateGreen(false);
+  lijnsensor.calibrateGreen();
 
   xb.print("groen gescand");
 
@@ -49,14 +48,14 @@ void setup() {
   xb.print("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
-  lijnsensor.calibrateBrown(false);
+  lijnsensor.calibrateBrown();
 
   xb.print("bruin gescand");
   xb.print("Leg de ZUMO op Grijs");
   xb.print("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
-  lijnsensor.calibrateGray(false);
+  lijnsensor.calibrateGray();
 
   xb.print("grijs gescand");
 

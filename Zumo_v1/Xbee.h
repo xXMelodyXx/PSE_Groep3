@@ -23,10 +23,11 @@ private:
   Zumo32U4ButtonA aKnop;
   Zumo32U4ButtonB bKnop;
   Zumo32U4ButtonC cKnop;
+  String text;
 
 public:
 
-void print(string text);
+void print(String text);
   /*!
     @brief Constructor van de Xbee klasse.
   */
