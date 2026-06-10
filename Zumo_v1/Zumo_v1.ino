@@ -1,9 +1,10 @@
 #include <Wire.h>
-#include "Lijnsensor.h"
-#include <Zumo32U4.h>
-#include "Xbee.h"
-#include "Motoren.h"
 
+#include "Lijnsensor.h"
+
+#include <Zumo32U4.h>
+#include "XbeeControl.h"
+#include "Motoren.h"
 
 
 Zumo32U4ButtonC buttonC;
@@ -12,56 +13,56 @@ Zumo32U4ButtonA buttonA;
 //Zumo32U4Motors motors;
 Motoren motoren;
 
-Xbee xb;
-Lijnsensor lijnsensor(&xb);
+Lijnsensor lijnsensor;
+//Xbee xbee;
 
 
 void setup() {
   //calibreren van de benodigde kleuren
   //Serial1.begin(9600);
   Serial1.begin(9600);
-  xb.print("test");
+  Serial1.println("test");
   delay(2000);
   lijnsensor.init();
-  xb.print("Leg de ZUMO op WIT");
-  xb.print("Druk op knop C om te starten");
+  Serial1.println("Leg de ZUMO op WIT");
+  Serial1.println("Druk op knop C om te starten");
   while (buttonC.isPressed() == false) {}
   delay(1000);
-  lijnsensor.calibrateWhite();
-  xb.print("--------------------------------");
-  xb.print("Leg de ZUMO op ZWART");
-  xb.print("Druk op knop C om te scannen");
+  lijnsensor.calibrateWhite(false);
+  Serial1.println("--------------------------------");
+  Serial1.println("Leg de ZUMO op ZWART");
+  Serial1.println("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
-  lijnsensor.calibrateBlack();
+  lijnsensor.calibrateBlack(false);
 
-  xb.print("zwart gescand");
-  xb.print("Leg de ZUMO op Groen");
-  xb.print("Druk op knop C om te scannen");
+  Serial1.println("zwart gescand");
+  Serial1.println("Leg de ZUMO op Groen");
+  Serial1.println("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
-  lijnsensor.calibrateGreen();
+  lijnsensor.calibrateGreen(false);
 
-  xb.print("groen gescand");
+  Serial1.println("groen gescand");
 
-  xb.print("Leg de ZUMO op Bruin");
-  xb.print("Druk op knop C om te scannen");
+  Serial1.println("Leg de ZUMO op Bruin");
+  Serial1.println("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
-  lijnsensor.calibrateBrown();
+  lijnsensor.calibrateBrown(false);
 
-  xb.print("bruin gescand");
-  xb.print("Leg de ZUMO op Grijs");
-  xb.print("Druk op knop C om te scannen");
+  Serial1.println("bruin gescand");
+  Serial1.println("Leg de ZUMO op Grijs");
+  Serial1.println("Druk op knop C om te scannen");
   while (buttonC.isPressed() == false) {}
   delay(1000);
-  lijnsensor.calibrateGray();
+  lijnsensor.calibrateGray(false);
 
-  xb.print("grijs gescand");
+  Serial1.println("grijs gescand");
 
-  xb.print("wait for button A");
+  Serial1.println("wait for button A");
   buttonA.waitForButton();
-  xb.print("start!");
+  Serial1.println("start!");
 
   //xbee.begin();
 }
@@ -69,70 +70,62 @@ void setup() {
 
 void loop() {
 
-
+  
 
   //xbee.update();
 
 
-  int keuze = lijnsensor.bepaalRichting();
+  int keuze = lijnsensor.bepaalRichting2();
 
-
+  
 
   switch (keuze) {
 
     case 0:
-      //rechtdoor
-      motoren.setSpeed(200, 200);
-      xb.print("case 0 : RECHTDOOR");
+      motoren.setSpeed(300, 300);
+      Serial1.println("case 0 : RECHTDOOR");
       break;
 
     case 1:
       //SCHERPE LINKS
       motoren.setSpeed(0, 200);
-      xb.print("case 1 : SCHERP LINKS");
+      Serial1.println("case 1 : SCHERP LINKS");
       break;
+
+
 
     case 2:
       //SCHERPE RECHTS
       motoren.setSpeed(200, 0);
-      xb.print("case 2 : SCHERP RECHTS");
+      Serial1.println("case 2 : SCHERP RECHTS");
       break;
+
+
 
     case 3:
       //SCHUINE LINKS
-      motoren.setSpeed(50, 200);
-      xb.print("case 3 : SCHUIN LINKS");
+      motoren.setSpeed(50, 300);
+      Serial1.println("case 3 : SCHUIN LINKS");
       break;
 
 
     case 4:
       //SCHUINE RECHTS
-      motoren.setSpeed(200, 50);
-      xb.print("case 4 : SCHUIN RECHTS");
+      motoren.setSpeed(300, 50);
+      Serial1.println("case 4 : SCHUIN RECHTS");
       break;
 
     case 5:
-      //groene lijn
-      motoren.setSpeed(100, 100);
-      xb.print("case  5: GROEN");
-      break;
-
-    case 6:
-      //bruine lijn
+    //groene lijn  
+       motoren.setSpeed(100, 100);
+      Serial1.println("case  5: GROEN");
       break;
 
 
     case 10:
-      //stoppen voor 2 sec
       motoren.stop();
       delay(2000);
-      xb.print("case 10: STOP 2 SEC");
-      break;
+      Serial1.println("case 10: STOP");
 
-    case 11:
-      //stoppen als op knop B gedrukt.
-      motoren.stop();
-      xb.print("case 11: STOP");
-      break;
   }
 }

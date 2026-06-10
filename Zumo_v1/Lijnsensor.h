@@ -1,13 +1,8 @@
 #include <Wire.h>
 #include <Zumo32U4.h>
-#include "HardwareSerial.h"
-#include "WString.h"
-#include "Xbee.h"
-#include "Motoren.h"
-#define NMRSENSOR 5
 
 struct sensordata {
-  int Gemiddelde[5];
+  int Value[5];
   int Min[5];
   int Max[5];
   bool detected[5];
@@ -17,32 +12,36 @@ class Lijnsensor {
 private:
   Zumo32U4LineSensors lineSensors;
   Zumo32U4ButtonB buttonB;
+
   unsigned int sensorValues[5];
-  int positie;
+
+
+
   sensordata greensensors;
   sensordata graysensors;
   sensordata brownsensors;
+
   sensordata blacksensors;
-  sensordata calibreer(String kleur);
-  int hoeveelMetingen;
-  Xbee* xb;
+
+
+  long totaal = 0;
+
+  void calibreer(bool debug, int waarde_min[5], int waarde_max[5]);
 
 public:
-  Lijnsensor(Xbee*);
+  Lijnsensor();
   void init();
-  void calibrateWhite();
-  void calibrateBlack();
-  void calibrateGreen();
-  void calibrateBrown();
-  void calibrateGray();
-  int leesPositie();
-  sensordata getGemiddelde(int hoeveelMetingen);
+  void calibrateWhite(bool debug);
+  void calibrateBlack(bool debug);
+  void calibrateGreen(bool debug);
+  void calibrateBrown(bool debug);
+  void calibrateGray(bool debug);
   bool GrayDetected();
   bool GreenDetected();
   bool BrownDetected();
-  bool BlackDetected();
-  int GrayPosition(int positie);
-  int GreenPosition(int positie);
-  int BrownPosition(int positie);
+  void read(bool debug);
+  void read(bool debug, int sensorNr);
+  //char bepaalRichting();
   int bepaalRichting();
+  int bepaalRichting2();
 };
