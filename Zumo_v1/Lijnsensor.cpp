@@ -4,9 +4,12 @@
 Lijnsensor::Lijnsensor(Xbee* xbee, ProximityBlok* p)
   : xb(xbee), proximityBlok(p) {}
 
-Motoren motors;
+
+//Motoren motors;
 
 void Lijnsensor::init() {
+  helling.start();
+  proximityBlok->init();
   lineSensors.initFiveSensors();
   for (int i = 0; i < 5; i++) {
     zwartsensors.Gemiddelde[i] = 0;
@@ -44,6 +47,10 @@ sensordata Lijnsensor::getGemiddelde(int hoeveelMetingen) {
     resultaat.Gemiddelde[i] = totaal[i] / (hoeveelMetingen + 1);
   }
   return resultaat;
+}
+
+void Lijnsensor:: simpelCalibreer(){
+  lineSensors.calibrate();
 }
 
 sensordata Lijnsensor::calibreer(String kleur) {

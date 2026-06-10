@@ -15,12 +15,12 @@ void Motoren :: initialiseer(Lijnsensor* l){
     if(i <= 50 || i >= 150){
       motors.setSpeeds(-400,400);
       Serial1.print(i);
-      //lijnsensor->simpelCalibreer();
+      l->simpelCalibreer();
     }
     else{
       motors.setSpeeds(400,-400);
       Serial1.println(i);
-      //lijnsensor->simpelCalibreer();
+      l->simpelCalibreer();
     }
     stop();
 

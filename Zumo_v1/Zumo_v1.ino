@@ -3,17 +3,18 @@
 #include <Zumo32U4.h>
 #include "Xbee.h"
 #include "Motoren.h"
+#include "ProximityBlok.h"
 
 
 
 Zumo32U4ButtonC buttonC;
 Zumo32U4ButtonA buttonA;
-//Zumo32U4ButtonB buttonB;
-//Zumo32U4Motors motors;
-Motoren motoren;
 
 Xbee xb;
-Lijnsensor lijnsensor(&xb);
+Motoren motoren;
+ProximityBlok proxBlok(&motoren);
+
+Lijnsensor lijnsensor(&xb, &proxBlok);
 
 
 void setup() {
