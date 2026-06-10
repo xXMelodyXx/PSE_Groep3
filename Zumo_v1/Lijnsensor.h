@@ -1,6 +1,3 @@
-#ifndef LIJNSENSOR_H
-#define LIJNSENSOR_H
-
 #include <Wire.h>
 #include <Zumo32U4.h>
 #include "HardwareSerial.h"
@@ -9,8 +6,6 @@
 #include "Motoren.h"
 #define NMRSENSOR 5
 
-#include "Helling.h"
-#include "ProximityBlok.h"
 struct sensordata {
   int Gemiddelde[5];
   int Min[5];
@@ -21,41 +16,34 @@ struct sensordata {
 class Lijnsensor {
 private:
   Zumo32U4LineSensors lineSensors;
-  Helling helling;
-  ProximityBlok* proximityBlok;
   Zumo32U4ButtonB buttonB;
   unsigned int sensorValues[5];
   int positie;
-  
-
-  sensordata greensensors;
-  sensordata graysensors;
-  sensordata brownsensors;
-  sensordata blacksensors;
+  sensordata groensensors;
+  sensordata grijssensors;
+  sensordata bruinsensors;
+  sensordata zwartsensors;
   sensordata calibreer(String kleur);
   int hoeveelMetingen;
   Xbee* xb;
-
+  Zumo32U4ButtonC buttonC;
 public:
-  Lijnsensor(Xbee* xbee,ProximityBlok* p);
+  Lijnsensor(Xbee*);
   void init();
-  void calibrateWhite();
-  void calibrateBlack();
-  void calibrateGreen();
-  void calibrateBrown();
-  void calibrateGray();
+  void getCalibratie();
+  void calibrateWit();
+  void calibrateZwart();
+  void calibrateGroen();
+  void calibrateBruin();
+  void calibrateGrijs();
   int leesPositie();
   sensordata getGemiddelde(int hoeveelMetingen);
-  void simpelCalibreer();
-  bool GrayDetected();
-  bool GreenDetected();
-  bool BrownDetected();
-  bool BlackDetected();
-  int GrayPosition(int positie);
-  int GreenPosition(int positie);
-  int BrownPosition(int positie);
+  bool GrijsDetected();
+  bool GroenDetected();
+  bool BruinDetected();
+  bool ZwartDetected();
+  int GrijsPosition(int positie);
+  int GroenPosition(int positie);
+  int BruinPosition(int positie);
   int bepaalRichting();
-  int getPositie();
 };
-
-#endif
