@@ -1,110 +1,26 @@
 #include "Lijnsensor.h"
 #define NMRSENSOR 5
 
-Lijnsensor::Lijnsensor(Xbee* xbee,ProximityBlok* p)
-  : xb(xbee),proximityBlok(p) {}
+Lijnsensor::Lijnsensor(Xbee* xbee, ProximityBlok* p)
+  : xb(xbee), proximityBlok(p) {}
 
-//Helling helling;
+Motoren motors;
 
 void Lijnsensor::init() {
-  helling.start();
-  proximityBlok->init();
   lineSensors.initFiveSensors();
-
   for (int i = 0; i < 5; i++) {
-    blacksensors.Gemiddelde[i] = 0;
-    blacksensors.Min[i] = 0;
-    blacksensors.Max[i] = 0;
+    zwartsensors.Gemiddelde[i] = 0;
+    zwartsensors.Min[i] = 0;
+    zwartsensors.Max[i] = 0;
 
-    greensensors.Gemiddelde[i] = 0;
-    greensensors.Min[i] = 0;
-    greensensors.Max[i] = 0;
+    groensensors.Gemiddelde[i] = 0;
+    groensensors.Min[i] = 0;
+    groensensors.Max[i] = 0;
   }
 }
 
 sensordata Lijnsensor::getGemiddelde(int hoeveelMetingen) {
   sensordata resultaat;
-  lineSensors.readCalibrated(sensorValues);
-  long totaal[NMRSENSOR];
-  for (int i = 0; i < NMRSENSOR; i++) {
-    totaal[i] += sensorValues[i];
-    resultaat.Min[i] = sensorValues[i];
-    resultaat.Max[i] = sensorValues[i];
-  }
-  for (int i = 0; i < hoeveelMetingen; i++) {
-    lineSensors.readCalibrated(sensorValues);
-    for (int j = 0; j < NMRSENSOR; j++) {
-      totaal[j] += sensorValues[j];
-      for (int j = 0; j < NMRSENSOR; j++) {
-          totaal[j] += sensorValues[j];
-          if (sensorValues[j] < resultaat.Min[j]) {
-             resultaat.Min[i] = sensorValues[j];
-          }
-          if (sensorValues[j] > resultaat.Max[j]) {
-             resultaat.Max[j] = sensorValues[j];
-          }
-      }
-    }
-  }
-  for (int i = 0; i < NMRSENSOR; i++) {
-    resultaat.Gemiddelde[i] = totaal[i] / (hoeveelMetingen + 1);
-  }
-  return resultaat;
-}
-
-void Lijnsensor ::simpelCalibreer() {
-  lineSensors.calibrate();
-}
-/*
-sensordata Lijnsensor::calibreer(bool debug, int waarde_min[5], int waarde_max[5]) {
-  lineSensors.calibrate();
-  // bool debug gebruikt om onnodige data outprint te beperken en overzichterlijker te maken
-  lineSensors.read(sensorValues);
-  int gem_waarde[5];
-  for (int i = 0; i < 5; i++) {
-    waarde_min[i] = sensorValues[i];
-    waarde_max[i] = sensorValues[i];
-
-    totaal = 0;
-
-    for (int j = 0; j < 40; j++) {
-      lineSensors.read(sensorValues);
-
-      totaal += sensorValues[i];
-      if (debug == true) {
-        Serial.println(sensorValues[i]);
-      }
-      if (sensorValues[i] < waarde_min[i]) {
-        waarde_min[i] = sensorValues[j];
-      }
-      if (sensorValues[i] > waarde_max[i]) {
-        waarde_max[i] = sensorValues[j];
-      }
-      delay(5);
-    }
-
-    // OPTIE TODO if statements dichtsbijzijnde kleur plaats van tolerantie
-    gem_waarde[i] = totaal / 40;
-    waarde_min[i] = waarde_min[i] * 0.5;
-    waarde_max[i] = waarde_max[i] * 1.5;
-    //tolerantie +/- 120 tijdens testen
-    //in plaats van plus x factor doen
-    Serial.println("KALIBRATIE KLAAR");
-    Serial.print("Gemiddelde: ");
-    Serial.println(gem_waarde[i]);
-    Serial.print("Minimum: ");
-    Serial.println(waarde_min[i]);
-    Serial.print("Maximum: ");
-    Serial.println(waarde_max[i]);
-  }
-}
-*/
-
-
-/*
-void Lijnsensor::calibrateBlack(bool debug) {
-  lineSensors.calibrate();
-
   lineSensors.readCalibrated(sensorValues);
   long totaal[NMRSENSOR];
   for (int i = 0; i < NMRSENSOR; i++) {
@@ -129,21 +45,24 @@ void Lijnsensor::calibrateBlack(bool debug) {
   }
   return resultaat;
 }
-*/
+
 sensordata Lijnsensor::calibreer(String kleur) {
+  xb->print("Leg de ZUMO op " + kleur);
+  xb->print("Druk op knop C om te scannen");
+  buttonC.waitForButton();
   sensordata resultaat = getGemiddelde(100);
+
   for (int i = 0; i < NMRSENSOR; i++) {
-    xb->print("kleur " + kleur + "aan het kalibreren.");
     xb->print("Gemiddelde: " + resultaat.Gemiddelde[i]);
     xb->print("Minimum: " + resultaat.Min[i]);
     xb->print("Maximum: " + resultaat.Max[i]);
   }
+  xb->print(kleur + " gescand");
   return resultaat;
 }
 
-
-int Lijnsensor::leesPositie() {
-  if (BlackDetected() || GreenDetected()) {
+int Lijnsensor::leesPositie() {  //TODO: toepassing in motoren.cpp
+  if (ZwartDetected() || GroenDetected()) {
     sensordata gemiddeldeMeting = getGemiddelde(3);
     long totaal = 0;
     long gewogenGemiddelde = 0;
@@ -157,162 +76,165 @@ int Lijnsensor::leesPositie() {
     return gewogenGemiddelde / totaal;  //
   }
 }
-//TODO: toepassing in motoren.cpp
 
-void Lijnsensor::calibrateWhite() {
+void Lijnsensor::getCalibratie() {
+  calibrateWit();
+  calibrateZwart();
+  calibrateGroen();
+  calibrateGrijs();
+  calibrateBruin();
+}
+
+void Lijnsensor::calibrateWit() {
   calibreer("wit");
 }
 
-
-void Lijnsensor::calibrateBlack() {
-  calibreer("zwart");
-  //TODO: correctie/drempelwaarde toevoegen met factor
-  //TODO: sensordata blacksensors opslaan
-}
-
-void Lijnsensor::calibrateGreen() {
-  calibreer("groen");
-  //TODO: correctie/drempelwaarde toevoegen met factor
-  //TODO: sensordata greensensors opslaan
-}
-
-void Lijnsensor::calibrateGray() {
-  calibreer("grijs");
-  //TODO: correctie/drempelwaarde toevoegen met factor
-  //TODO: sensordata greysensors opslaan
-}
-
-void Lijnsensor::calibrateBrown() {
-  calibreer("bruin");
-  //TODO: correctie/drempelwaarde toevoegen met factor
-  //TODO: sensordata brownsensors opslaan
-}
-
-bool Lijnsensor::BlackDetected() {
-  for (int i = 0; i < 5; i++) {
-    blacksensors.detected[i] = false;
+void Lijnsensor::calibrateZwart() {
+  sensordata tempZwart = calibreer("zwart");
+  for (int i = 0; i < NMRSENSOR; i++) {
+    zwartsensors.Gemiddelde[i] = tempZwart.Gemiddelde[i];
+    zwartsensors.Min[i] = tempZwart.Min[i] * 0, 4;  //toepassing correctie
+    zwartsensors.Max[i] = tempZwart.Max[i] * 1, 5;
   }
-  bool blackSeen = false;
+}
+
+void Lijnsensor::calibrateGroen() {
+  sensordata tempGroen = calibreer("groen");
+  for (int i = 0; i < NMRSENSOR; i++) {
+    groensensors.Gemiddelde[i] = tempGroen.Gemiddelde[i];
+    groensensors.Min[i] = tempGroen.Min[i] * 0, 5;  //toepassing correctie
+    groensensors.Max[i] = tempGroen.Max[i] * 1, 5;
+  }
+}
+
+void Lijnsensor::calibrateGrijs() {
+  sensordata tempGrijs = calibreer("grijs");
+  for (int i = 0; i < NMRSENSOR; i++) {
+    grijssensors.Gemiddelde[i] = tempGrijs.Gemiddelde[i];
+    grijssensors.Min[i] = tempGrijs.Min[i] * 0, 5;  //toepassing correctie
+    grijssensors.Max[i] = tempGrijs.Max[i] * 1, 5;
+  }
+}
+
+void Lijnsensor::calibrateBruin() {
+  sensordata tempBruin = calibreer("bruin");
+  for (int i = 0; i < NMRSENSOR; i++) {
+    bruinsensors.Gemiddelde[i] = tempBruin.Gemiddelde[i];
+    bruinsensors.Min[i] = tempBruin.Min[i] * 0, 5;  //toepassing correctie
+    bruinsensors.Max[i] = tempBruin.Max[i] * 1, 5;
+  }
+}
+
+bool Lijnsensor::ZwartDetected() {
   for (int i = 0; i < 5; i++) {
-    if (sensorValues[i] >= blacksensors.Min[i] && sensorValues[i] <= blacksensors.Max[i]) {
-      blacksensors.detected[i] = true;
-      blackSeen = true;
+    zwartsensors.detected[i] = false;
+  }
+  bool zwartSeen = false;
+  for (int i = 0; i < 5; i++) {
+    if (sensorValues[i] >= zwartsensors.Min[i] && sensorValues[i] <= zwartsensors.Max[i]) {
+      zwartsensors.detected[i] = true;
+      zwartSeen = true;
     }
   }
-  return blackSeen;
+  return zwartSeen;
 }
 
-bool Lijnsensor::GrayDetected() {
+bool Lijnsensor::GrijsDetected() {
   for (int i = 0; i < 5; i++) {
-    graysensors.detected[i] = false;
+    grijssensors.detected[i] = false;
   }
-  bool graySeen = false;
+  bool grijsSeen = false;
   for (int i = 0; i < 5; i++) {
-    if (sensorValues[i] >= graysensors.Min[i] && sensorValues[i] <= graysensors.Max[i]) {
-      graysensors.detected[i] = true;
-      graySeen = true;
+    if (sensorValues[i] >= grijssensors.Min[i] && sensorValues[i] <= grijssensors.Max[i]) {
+      grijssensors.detected[i] = true;
+      grijsSeen = true;
     }
   }
-  return graySeen;
+  return grijsSeen;
 }
 
-int Lijnsensor::GrayPosition(int positie) {
-  if (GrayDetected()) {
-    if (graysensors.detected[0] && graysensors.detected[4]) {
+int Lijnsensor::GrijsPosition(int positie) {
+  if (GrijsDetected()) {
+    if (grijssensors.detected[0] && grijssensors.detected[4]) {
       return 10;
     }
 
-    if (graysensors.detected[0]) {
+    if (grijssensors.detected[0]) {
       return 1;
     }
 
-    if (graysensors.detected[4]) {
+    if (grijssensors.detected[4]) {
       return 2;
     }
   }
 }
 
-bool Lijnsensor::GreenDetected() {
+bool Lijnsensor::GroenDetected() {
   for (int i = 0; i < 5; i++) {
-    greensensors.detected[i] = false;
+    groensensors.detected[i] = false;
   }
-  bool greenSeen = false;
+  bool groenSeen = false;
   for (int i = 0; i < 5; i++) {
-    if (sensorValues[i] >= greensensors.Min[i] && sensorValues[i] <= greensensors.Max[i]) {
-      Serial1.println("GROEN IS GEDETECTEERD");
-      greensensors.detected[i] = true;
-      bool greenSeen = true;
+    if (sensorValues[i] >= groensensors.Min[i] && sensorValues[i] <= groensensors.Max[i]) {
+      groensensors.detected[i] = true;
+      bool groenSeen = true;
     }
   }
-  return greenSeen;
+  return groenSeen;
 }
 
-// als er teveel afwijking is graysensors.detected[1] & graysensors.detected[3] toevoegen
-int Lijnsensor::GreenPosition(int positie) {
-  if (GreenDetected()) {
-    if (greensensors.detected[0]) {
+// als er teveel afwijking is grijssensors.detected[1] & grijssensors.detected[3] toevoegen
+int Lijnsensor::GroenPosition(int positie) {
+  if (GroenDetected()) {
+    if (groensensors.detected[0]) {
       return 1;
     }
 
-    if (greensensors.detected[4]) {
+    if (groensensors.detected[4]) {
       return 2;
     }
 
-    if ((greensensors.detected[2]) && (!greensensors.detected[0]) && (!greensensors.detected[4])) {
+    if ((groensensors.detected[2]) && (!groensensors.detected[0]) && (!groensensors.detected[4])) {
       return 5;
     }
   }
 }
 
-bool Lijnsensor::BrownDetected() {
+bool Lijnsensor::BruinDetected() {
   for (int i = 0; i < 5; i++) {
-    brownsensors.detected[i] = false;
+    bruinsensors.detected[i] = false;
   }
-  bool brownSeen = false;
+  bool bruinSeen = false;
   for (int i = 0; i < 5; i++) {
-    if (sensorValues[i] >= brownsensors.Min[i] && sensorValues[i] <= brownsensors.Max[i]) {
-      brownsensors.detected[i] = true;
-      bool brownSeen = true;
+    if (sensorValues[i] >= bruinsensors.Min[i] && sensorValues[i] <= bruinsensors.Max[i]) {
+      bruinsensors.detected[i] = true;
+      bool bruinSeen = true;
     }
   }
-  return brownSeen;
+  return bruinSeen;
 }
 
-// eventueel uit proberen zonder BrownPosition alleen met Bool naar Bepaalrichting
+// eventueel uit proberen zonder BruinPosition alleen met Bool naar Bepaalrichting
 // Staat nu extra erin voor extra nauwkeurigheid
-int Lijnsensor::BrownPosition(int positie) {
-  if (BrownDetected()) {
-    if (brownsensors.detected[0] && brownsensors.detected[4]) {
+int Lijnsensor::BruinPosition(int positie) {
+  if (BruinDetected()) {
+    if (bruinsensors.detected[0] && bruinsensors.detected[4]) {
       return 6;
     }
   }
 }
 
-int Lijnsensor::getPositie() {
-  return lineSensors.readLine(sensorValues);
-}
 
-/**
- * return int voor het switchen van de cases in main
- */
+
+
 int Lijnsensor::bepaalRichting() {
+  int positie = lineSensors.readLine(sensorValues);
 
-  positie = lineSensors.readLine(sensorValues);
-
-
-  if (buttonB.isPressed()) {
-    return 11;
-  }
-
-  if (helling.hellingGedetecteerd()) {
-    return 7;
-  }
-
-  if ((positie < 300) || (GreenPosition(positie) == 1) || (GrayPosition(positie) == 1)) {
+  if ((positie < 300) || (GroenPosition(positie) == 1) || (GrijsPosition(positie) == 1)) {
     return 1;
   }
 
-  if ((positie > 3700) || (GrayPosition(positie) == 2)) {
+  if ((positie > 3700) || (GrijsPosition(positie) == 2)) {
     return 2;
   }
 
@@ -324,20 +246,21 @@ int Lijnsensor::bepaalRichting() {
     return 4;
   }
 
-  // if (GreenPosition(positie) == 5) {
-  //   return 5;
-  // }
+  if (GroenPosition(positie) == 5) {
+    return 5;
+  }
 
-  if (BrownPosition(positie) == 6) {
+  if (BruinPosition(positie) == 6) {
     return 6;
   }
 
-
-  if (GrayPosition(positie) == 10) {
+  if (GrijsPosition(positie) == 10) {
     return 10;
   }
 
-
+  if (buttonB.isPressed()) {
+    return 11;
+  }
 
   return 0;
 }
