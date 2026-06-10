@@ -26,6 +26,7 @@ private:
 
 public:
 
+void print(string text);
   /*!
     @brief Constructor van de Xbee klasse.
   */
