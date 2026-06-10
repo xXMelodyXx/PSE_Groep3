@@ -22,7 +22,7 @@ class Lijnsensor {
 private:
   Zumo32U4LineSensors lineSensors;
   Helling helling;
-  ProximityBlok proximityBlok;
+  ProximityBlok* proximityBlok;
   Zumo32U4ButtonB buttonB;
   unsigned int sensorValues[5];
   int positie;
@@ -37,7 +37,7 @@ private:
   Xbee* xb;
 
 public:
-  Lijnsensor(Xbee* xbee);
+  Lijnsensor(Xbee* xbee,ProximityBlok* p);
   void init();
   void calibrateWhite();
   void calibrateBlack();

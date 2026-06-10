@@ -3,6 +3,7 @@
 #include <Zumo32U4.h>
 #include "Xbee.h"
 #include "Motoren.h"
+#include "ProximityBlok.h"
 
 
 
@@ -10,10 +11,13 @@ Zumo32U4ButtonC buttonC;
 Zumo32U4ButtonA buttonA;
 
 Xbee xb;
-Lijnsensor lijnsensor(&xb);
-Motoren motoren(&lijnsensor);
-Motoren motors;
 
+
+
+Motoren motoren;
+ProximityBlok proxBlok(&motoren);
+//TODO ee functie die ervoor zorgt dat lijnsensor de proximityblok aanroept,
+Lijnsensor lijnsensor(&xb,&proxBlok); 
 
 //── PID instellingen ──────────────────────────────
 const int BASE_SPEED = 200;   // basissnelheid
@@ -22,7 +26,7 @@ const int MIN_SPEED  = 0;     // minimale motorsnelheid
 
 // Pas deze drie waarden aan tijdens testen:
 const float KP = 0.25;   // Proportioneel  – reageert op huidige fout
-const float KI = 0.0;    // Integraal      – compenseert aanhoudende fout
+const float KI = 0.3;    // Integraal      – compenseert aanhoudende fout
 //const float KD = 1.5;    // Differentieel  – dempt overshoot/slingeren
 // ─────────────────────────────────────────────────
 
@@ -38,7 +42,7 @@ void setup() {
   xb.print("STARTEN MET SIMPEL CALIBRATIE");
   xb.print("Duk op knop C");
   while(buttonC.isPressed() == false){}
-  motoren.initialiseer();
+  motoren.initialiseer(&lijnsensor);
 
   xb.print("Leg de ZUMO op WIT");
   xb.print("Druk op knop C om te starten");
@@ -195,8 +199,6 @@ void loop() {
       }
       Serial1.println("Hervat!");
       break;
-
-    case 12: 
       
   }
 }

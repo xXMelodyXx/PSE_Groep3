@@ -1,14 +1,14 @@
 #include "Lijnsensor.h"
 #define NMRSENSOR 5
 
-Lijnsensor::Lijnsensor(Xbee* xbee)
-  : xb(xbee) {}
+Lijnsensor::Lijnsensor(Xbee* xbee,ProximityBlok* p)
+  : xb(xbee),proximityBlok(p) {}
 
 //Helling helling;
 
 void Lijnsensor::init() {
   helling.start();
-  proximityBlok.init();
+  proximityBlok->init();
   lineSensors.initFiveSensors();
 
   for (int i = 0; i < 5; i++) {
@@ -35,13 +35,14 @@ sensordata Lijnsensor::getGemiddelde(int hoeveelMetingen) {
     lineSensors.readCalibrated(sensorValues);
     for (int j = 0; j < NMRSENSOR; j++) {
       totaal[j] += sensorValues[j];
-    for (int j = 0; j < NMRSENSOR; j++) {
-      totaal[j] += sensorValues[j];
-      if (sensorValues[j] < resultaat.Min[j]) {
-        resultaat.Min[i] = sensorValues[j];
-      }
-      if (sensorValues[j] > resultaat.Max[j]) {
-        resultaat.Max[j] = sensorValues[j];
+      for (int j = 0; j < NMRSENSOR; j++) {
+          totaal[j] += sensorValues[j];
+          if (sensorValues[j] < resultaat.Min[j]) {
+             resultaat.Min[i] = sensorValues[j];
+          }
+          if (sensorValues[j] > resultaat.Max[j]) {
+             resultaat.Max[j] = sensorValues[j];
+          }
       }
     }
   }
@@ -161,7 +162,7 @@ int Lijnsensor::leesPositie() {
 void Lijnsensor::calibrateWhite() {
   calibreer("wit");
 }
-*/
+
 
 void Lijnsensor::calibrateBlack() {
   calibreer("zwart");

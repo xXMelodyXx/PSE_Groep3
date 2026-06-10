@@ -10,7 +10,7 @@ private:
   Zumo32U4LineSensors lineSensors;
   Zumo32U4ProximitySensors proxSensors;
 
-  Motoren motoren;
+  Motoren* motoren;
 
   unsigned int sensorValues[5];
 
@@ -43,7 +43,7 @@ private:
   void stopVoorAltijd();
 
 public:
-  ProximityBlok();
+  ProximityBlok(Motoren* m);
 
   void init();
   void start();

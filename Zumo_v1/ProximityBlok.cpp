@@ -2,7 +2,7 @@
 #include "WString.h"
 #include "ProximityBlok.h"
 
-ProximityBlok::ProximityBlok() {
+ProximityBlok::ProximityBlok(Motoren* m ):motoren(m) {
   bruinAlGedetecteerd = false;
 
   rijSnelheid = 180;
@@ -33,12 +33,12 @@ void ProximityBlok::init() {
   lineSensors.initFiveSensors();
   proxSensors.initFrontSensor();
 
-  motoren.stop();
+  motoren->stop();
 }
 
 void ProximityBlok::start() {
   if (BrownDetected() && !bruinAlGedetecteerd) {
-    motoren.stop();
+    motoren->stop();
     delay(300);
 
     // Eerst vooruit rijden
@@ -52,19 +52,19 @@ void ProximityBlok::start() {
 }
 
 void ProximityBlok::rijdVooruitTicks(long ticks) {
-  motoren.resetEncoders();
+  motoren->resetEncoders();
 
-  motoren.setSpeed(rijSnelheid, rijSnelheid);
+  motoren->setSpeed(rijSnelheid, rijSnelheid);
 
   while (gemiddeldeTicks() < ticks) {
     delay(5);
   }
 
-  motoren.stop();
+  motoren->stop();
 }
 
 void ProximityBlok::zoekBlok() {
-  motoren.resetEncoders();
+  motoren->resetEncoders();
 
   long besteTicks = 0;
 
@@ -76,7 +76,7 @@ void ProximityBlok::zoekBlok() {
   bool bestePuntGevonden = false;
 
   // Zumo draait rond om het blok te zoeken
-  motoren.setSpeed(draaiSnelheid, -draaiSnelheid);
+  motoren->setSpeed(draaiSnelheid, -draaiSnelheid);
 
   while (gemiddeldeTicks() < draai360Ticks) {
     leesProximity(links, rechts);
@@ -118,7 +118,7 @@ void ProximityBlok::zoekBlok() {
     delay(20);
   }
 
-  motoren.stop();
+  motoren->stop();
   delay(300);
 
   if (!bestePuntGevonden) {
@@ -136,24 +136,24 @@ void ProximityBlok::zoekBlok() {
 }
 
 void ProximityBlok::draaiTerug(long ticks) {
-  motoren.resetEncoders();
+  motoren->resetEncoders();
 
   // Terugdraaien in de andere richting
-  motoren.setSpeed(-draaiSnelheid, draaiSnelheid);
+  motoren->setSpeed(-draaiSnelheid, draaiSnelheid);
 
   while (gemiddeldeTicks() < ticks) {
     delay(5);
   }
 
-  motoren.stop();
+  motoren->stop();
   delay(300);
 }
 
 void ProximityBlok::duwTotZwart() {
-  motoren.setSpeed(duwSnelheid, duwSnelheid);
+  motoren->setSpeed(duwSnelheid, duwSnelheid);
 
   while (!BlackDetected()) {
-    motoren.setSpeed(duwSnelheid, duwSnelheid);
+    motoren->setSpeed(duwSnelheid, duwSnelheid);
     delay(20);
   }
 
@@ -198,14 +198,14 @@ void ProximityBlok::leesProximity(int links, int rechts) {
 }
 
 long ProximityBlok::gemiddeldeTicks() {
-  long links = abs(motoren.getEncoderLinks());
-  long rechts = abs(motoren.getEncoderRechts());
+  long links = abs(motoren->getEncoderLinks());
+  long rechts = abs(motoren->getEncoderRechts());
 
   return (links + rechts) / 2;
 }
 
 void ProximityBlok::stopVoorAltijd() {
-  motoren.stop();
+  motoren->stop();
 
   while (true) {
     delay(100);

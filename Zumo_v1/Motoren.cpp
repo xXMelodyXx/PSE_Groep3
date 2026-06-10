@@ -1,26 +1,26 @@
 #include "Motoren.h"
+#include "Lijnsensor.h"
 
-Motoren::Motoren(Lijnsensor* l) : lijnsensor(l){
+Motoren::Motoren() {
 }
-Motoren:: Motoren();
 
 void Motoren::setSpeed(int links, int rechts) {
 
   motors.setSpeeds(links, rechts);
 }
 
-void Motoren :: initialiseer(){
+void Motoren :: initialiseer(Lijnsensor* l){
   for(int i = 0; i < 200; i++){
     delay(20);
     if(i <= 50 || i >= 150){
       motors.setSpeeds(-400,400);
       Serial1.print(i);
-      lijnsensor->simpelCalibreer();
+      //lijnsensor->simpelCalibreer();
     }
     else{
       motors.setSpeeds(400,-400);
       Serial1.println(i);
-      lijnsensor->simpelCalibreer();
+      //lijnsensor->simpelCalibreer();
     }
     stop();
 
