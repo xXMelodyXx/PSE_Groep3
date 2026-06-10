@@ -1,4 +1,3 @@
-
 /*!
   @file XBeeControl.cpp
   @brief Implementatiebestand van de klasse XBeeControl.
@@ -6,34 +5,16 @@
 
 #include "XBeeControl.h"
 
-/*!
-  @brief Constructor van XBeeControl.
-
-  Initialiseert de standaardwaarden van de variabelen.
-*/
-
 XBeeControl::XBeeControl() {
   command = 'X';
   lastCommandTime = 0;
 }
 
-/*!
-  @brief Start de seriële communicatie.
-
-  Serial wordt gebruikt voor debug-output.
-  Serial1 wordt gebruikt voor de XBee communicatie.
-*/
 void XBeeControl::begin() {
   Serial.begin(9600);
   Serial1.begin(9600);
 }
 
-/*!
-  @brief Verwerkt ontvangen commando's van de XBee.
-
-  Deze functie leest de ontvangen tekens via XBee
-  en bestuurt de motoren van de robot.
-*/
 void XBeeControl::update() {
 
   // Controleer of er data beschikbaar is
@@ -54,28 +35,38 @@ void XBeeControl::update() {
     command = 'X';
   }
 
+  // Laat de robot rijden op basis van commando
+  rijden(command);
+}
+
+/*!
+  @brief Bestuurt de motoren op basis van een toets.
+  @param toets Letter van toetsenbord (W, A, S, D, X)
+*/
+void XBeeControl::rijden(char toets) {
+
   // Vooruit rijden
-  if (command == 'W') {
+  if (toets == 'W') {
     motors.setSpeeds(200, 200);
   }
 
   // Stoppen
-  else if (command == 'X') {
+  else if (toets == 'X') {
     motors.setSpeeds(0, 0);
   }
 
   // Achteruit rijden
-  else if (command == 'S') {
+  else if (toets == 'S') {
     motors.setSpeeds(-200, -200);
   }
 
   // Links draaien
-  else if (command == 'A') {
-    motors.setSpeeds(0, 200);
+  else if (toets == 'A') {
+    motors.setSpeeds(0, 400);
   }
 
   // Rechts draaien
-  else if (command == 'D') {
+  else if (toets == 'D') {
     motors.setSpeeds(200, 0);
   }
 }

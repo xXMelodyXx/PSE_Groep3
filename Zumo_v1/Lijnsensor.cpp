@@ -3,13 +3,16 @@
 #include "Lijnsensor.h"
 #include "XbeeControl.h"
 #include "Motoren.h"
+//#include "Helling.h"
 
 Lijnsensor::Lijnsensor() {}
 
-Motoren motors;
+//Helling helling;
 
 void Lijnsensor::init() {
+  helling.start();
   lineSensors.initFiveSensors();
+  
   for (int i = 0; i < 5; i++) {
     blacksensors.Value[i] = 0;
     blacksensors.Min[i] = 0;
@@ -21,6 +24,56 @@ void Lijnsensor::init() {
   }
 }
 
+void Lijnsensor :: simpelCalibreer(){
+  lineSensors.calibrate();
+}
+
+sensordata Lijnsensor::calibreer(bool debug, int waarde_min[5], int waarde_max[5]) {
+  lineSensors.calibrate();
+  // bool debug gebruikt om onnodige data outprint te beperken en overzichterlijker te maken
+  lineSensors.read(sensorValues);
+  int gem_waarde[5];
+  for (int i = 0; i < 5; i++) {
+    waarde_min[i] = sensorValues[i];
+    waarde_max[i] = sensorValues[i];
+
+    totaal = 0;
+
+    for (int j = 0; j < 40; j++) {
+      lineSensors.read(sensorValues);
+
+      totaal += sensorValues[i];
+      if (debug == true) {
+        Serial.println(sensorValues[i]);
+      }
+      if (sensorValues[i] < waarde_min[i]) {
+        waarde_min[i] = sensorValues[j];
+      }
+      if (sensorValues[i] > waarde_max[i]) {
+        waarde_max[i] = sensorValues[j];
+      }
+      delay(5);
+    }
+
+    // OPTIE TODO if statements dichtsbijzijnde kleur plaats van tolerantie
+    gem_waarde[i] = totaal / 40;
+    waarde_min[i] = waarde_min[i] * 0.5;
+    waarde_max[i] = waarde_max[i] * 1.5;
+    //tolerantie +/- 120 tijdens testen
+    //in plaats van plus x factor doen
+    Serial.println("KALIBRATIE KLAAR");
+    Serial.print("Gemiddelde: ");
+    Serial.println(gem_waarde[i]);
+    Serial.print("Minimum: ");
+    Serial.println(waarde_min[i]);
+    Serial.print("Maximum: ");
+    Serial.println(waarde_max[i]);
+  }
+}
+
+void Lijnsensor::calibrateGreen(bool debug) {
+  calibreer(debug, greenMin, greenMax);
+}
 
 
 void Lijnsensor::calibrateWhite(bool debug) {
@@ -63,6 +116,7 @@ void Lijnsensor::calibrateBlack(bool debug) {
   }
 }
 
+/*
 void Lijnsensor::calibrateGreen(bool debug) {
   lineSensors.calibrate();
 
@@ -96,7 +150,7 @@ void Lijnsensor::calibrateGreen(bool debug) {
     Serial1.println(greensensors.Max[i]);
   }
 }
-
+*/
 
 void Lijnsensor::calibrateGray(bool debug) {
   lineSensors.calibrate();
@@ -189,19 +243,19 @@ int Lijnsensor::GrayPosition(int positie) {
   if (GrayDetected()) {
     if (graysensors.detected[0] && graysensors.detected[4]) {
       // evt. delay als hij te snel positie herkent
-      if (positie < 300 && positie > 2500) {
+      if (positie < 300 || positie > 2500) {
           return 10;
         }
     }
 
     if (graysensors.detected[0]) {
-      if (positie < 300 && positie > 2500) {
+      if (positie < 300 || positie > 2500) { //heb && replaced met ||
           return 1;
         }
     }
 
     if (graysensors.detected[4]) {
-      if (positie < 300 && positie > 2500) {
+      if (positie < 300 || positie > 2500) {
           return 2;
         }
     }
@@ -214,6 +268,7 @@ bool Lijnsensor::GreenDetected() {
   }
   for (int i = 0; i < 5; i++) {
     if (sensorValues[i] >= greensensors.Min[i] && sensorValues[i] <= greensensors.Max[i]) {
+      Serial1.println("GROEN IS GEDETECTEERD");
       greensensors.detected[i] = true;
       return true;
     }
@@ -259,11 +314,29 @@ int Lijnsensor::BrownPosition(int positie) {
   }
 }
 
+int Lijnsensor::getPositie() {
+  return lineSensors.readLine(sensorValues);
+}
+
 /**
  * return int voor het switchen van de cases in main
  */
 int Lijnsensor::bepaalRichting() {
-  int positie = lineSensors.readLine(sensorValues);
+
+  positie = lineSensors.readLine(sensorValues);
+
+
+    if (buttonB.isPressed()) {
+    return 11;
+  }
+
+  if (helling.hellingGedetecteerd()) {
+    return 7;
+    
+  }
+
+
+  
 
   if ((positie < 300) || (GreenPosition(positie) == 1) || (GrayPosition(positie) == 1)) {
     return 1;
@@ -281,21 +354,20 @@ int Lijnsensor::bepaalRichting() {
     return 4;
   }
 
-  if (GreenPosition(positie) == 5) {
-    return 5;
-  }
+  // if (GreenPosition(positie) == 5) {
+  //   return 5;
+  // }
 
   if (BrownPosition(positie) == 6) {
     return 6;
   }
+  
 
   if (GrayPosition(positie) == 10) {
     return 10;
   }
 
-  if (buttonB.isPressed()) {
-    return 11;
-  }
+
 
   return 0;
 }
