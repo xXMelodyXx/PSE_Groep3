@@ -13,13 +13,13 @@ public:
     bool hellingGedetecteerd();
     float geefHoek();
     float getBeginHoek();
+    float berekenHoek();
 
 private:
     Zumo32U4IMU imu;
 
     float beginHoek;
     float huidigeHoek;
-    float berekenHoek();
 };
 
 #endif
