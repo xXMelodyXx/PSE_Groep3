@@ -1,3 +1,4 @@
+#include "WString.h"
 #include "Xbee.h"
 #include <ctype.h>
 
@@ -11,6 +12,10 @@ void Xbee::begin() {
 
   Serial.begin(9600);
   Serial1.begin(9600);
+}
+
+void Xbee::print(String text){
+    Serial1.println(text);
 }
 
 void Xbee::update() {
@@ -52,6 +57,10 @@ bool Xbee::knopC() {
 
   return cKnop.getSingleDebouncedPress();
 }
+
+// void Xbee::print(String text){
+//     Serial1.println(text);
+// }
 
 char Xbee::getCommand() {
 
