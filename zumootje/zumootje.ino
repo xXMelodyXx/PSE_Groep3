@@ -19,12 +19,12 @@ Lijnsensor lijnsensor(&xb, &proxBlok);
 //── PID instellingen ──────────────────────────────
 const int BASE_SPEED = 200;   // basissnelheid
 const int MAX_SPEED  = 400;   // maximale motorsnelheid
-const int MIN_SPEED  = 0;     // minimale motorsnelheid
+const int MIN_SPEED  = -400;     // minimale motorsnelheid
 
 // Pas deze drie waarden aan tijdens testen:
-const float KP = 0.11;   // Proportioneel  – reageert op huidige fout
-const float KI = 0.0;    // Integraal      – compenseert aanhoudende fout
-const float KD = 1.5;    // Differentieel  – dempt overshoot/slingeren
+const float KP = 0.6;   // Proportioneel  – reageert op huidige fout
+const float KI = 0;    // Integraal      – compenseert aanhoudende fout
+//const float KD = 1.5;    // Differentieel  – dempt overshoot/slingeren
 // ─────────────────────────────────────────────────
 
 // PID variabelen
@@ -34,15 +34,14 @@ float integral    = 0;
 void rijdenMetPID() {
   int positie = lijnsensor.leesPositie();  
 
-  float error = positie - 2000;
+  float error = positie - 3000;
   integral += error;
   integral = constrain(integral, -5000, 5000);
 
-  Afgeleide
-  float derivative = error - prevError;
-  prevError = error;
-  
-  float correctie = (KP * error) + (KI * integral) + (KD * derivative);
+  // Afgeleide
+  // float derivative = error - prevError;
+  // prevError = error;
+  float correctie = (KP * error) + (KI * integral);
 
   // Motorsnelheden berekenen
   int linksSnelheid  = constrain((int)(BASE_SPEED + correctie), MIN_SPEED, MAX_SPEED);
@@ -57,10 +56,9 @@ void setup() {
   Serial1.begin(9600);
   xb.print("test");
   delay(2000);
-  while (buttonC.isPressed() == false) {}
-  motoren.initialiseer(&lijnsensor);
-
+  buttonC.waitForButton();
   lijnsensor.init();
+  motoren.initialiseer(&lijnsensor);
   lijnsensor.getCalibratie();
 
   /*
@@ -100,13 +98,13 @@ void setup() {
 
   xb.print("grijs gescand");
 
-
+*/
   xb.print("wait for button A");
   buttonA.waitForButton();
   xb.print("start!");
-  */
+  
 
-  //xbee.begin();
+  xb.begin();
 }
 
 
@@ -197,5 +195,5 @@ void loop() {
       Serial1.println("Hervat!");
       
       break;
-  }  
+  }
 }

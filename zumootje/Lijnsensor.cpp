@@ -11,31 +11,24 @@ void Lijnsensor::init() {
   helling.start();
   proximityBlok->init();
   lineSensors.initFiveSensors();
-  for (int i = 0; i < 5; i++) {
-    zwartsensors.Gemiddelde[i] = 0;
-    zwartsensors.Min[i] = 0;
-    zwartsensors.Max[i] = 0;
-
-    groensensors.Gemiddelde[i] = 0;
-    groensensors.Min[i] = 0;
-    groensensors.Max[i] = 0;
-  }
 }
 
 sensordata Lijnsensor::getGemiddelde(int hoeveelMetingen) {
   sensordata resultaat;
+
+  lineSensors.readCalibrated(sensorValues);
+
   long totaal[NMRSENSOR];
 
-  lineSensors.read(sensorValues);
 
   for (int i = 0; i < NMRSENSOR; i++) {
-    totaal[i] = 0;
+    totaal[i] = sensorValues[i];
     resultaat.Min[i] = sensorValues[i];
     resultaat.Max[i] = sensorValues[i];
   }
 
   for (int i = 0; i < hoeveelMetingen; i++) {
-    lineSensors.read(sensorValues);
+    lineSensors.readCalibrated(sensorValues);
 
     for (int j = 0; j < NMRSENSOR; j++) {
       totaal[j] += sensorValues[j];
@@ -48,12 +41,10 @@ sensordata Lijnsensor::getGemiddelde(int hoeveelMetingen) {
         resultaat.Max[j] = sensorValues[j];
       }
     }
-
-    delay(5);
   }
 
   for (int i = 0; i < NMRSENSOR; i++) {
-    resultaat.Gemiddelde[i] = totaal[i] / hoeveelMetingen;
+    resultaat.Gemiddelde[i] = totaal[i] / (hoeveelMetingen + 1);
   }
 
   return resultaat;
@@ -69,11 +60,21 @@ sensordata Lijnsensor::calibreer(String kleur) {
   buttonC.waitForButton();
 
   sensordata resultaat = getGemiddelde(100);
+
+  String minString = "Minimum: ";
+  String maxString = "Maximum: ";
+  String gemString = "Gemiddelde: ";
   for (int i = 0; i < NMRSENSOR; i++) {
-    xb->print(String("Gemiddelde: ") + resultaat.Gemiddelde[i]);
-    xb->print(String("Minimum: ") + resultaat.Min[i]);
-    xb->print(String("Maximum: ") + resultaat.Max[i]);
+    minString += resultaat.Min[i];
+    minString += " ";
+    maxString += resultaat.Max[i];
+    maxString += " ";
+    gemString += resultaat.Gemiddelde[i];
+    gemString += " ";
   }
+  xb->print(minString);
+  xb->print(maxString);
+  xb->print(gemString);
   xb->print(kleur + " gescand");
   return resultaat;
 }
@@ -85,12 +86,12 @@ int Lijnsensor::leesPositie() {
   long gewogenGemiddelde = 0;
 
   for (int i = 0; i < NMRSENSOR; i++) {
-    totaal += gemiddeldeMeting.Gemiddelde[i];
-    gewogenGemiddelde += (long)gemiddeldeMeting.Gemiddelde[i] * (i * 1000L);
+    totaal += gemiddeldeMeting.Gemiddelde[i];                                       // alle gemiddelden van alle sensoren opgeteld
+    gewogenGemiddelde += (long)gemiddeldeMeting.Gemiddelde[i] * ((i + 1) * 1000L);  // +1 want *0 = 0.
   }
 
   if (totaal <= 0) {
-    return 2000;
+    return 3000;  //ALS GEEN LIJN RECHTDOOR
   }
 
   return gewogenGemiddelde / totaal;
@@ -176,8 +177,7 @@ bool Lijnsensor::GrijsDetected() {
   bool grijsSeen = false;
 
   for (int i = 0; i < 5; i++) {
-    if (sensorValues[i] >= grijssensors.Min[i] &&
-        sensorValues[i] <= grijssensors.Max[i]) {
+    if (sensorValues[i] >= grijssensors.Min[i] && sensorValues[i] <= grijssensors.Max[i]) {
 
       grijssensors.detected[i] = true;
       grijsSeen = true;
@@ -254,8 +254,7 @@ bool Lijnsensor::BruinDetected() {
   bool bruinSeen = false;
 
   for (int i = 0; i < 5; i++) {
-    if (sensorValues[i] >= bruinsensors.Min[i] &&
-        sensorValues[i] <= bruinsensors.Max[i]) {
+    if (sensorValues[i] >= bruinsensors.Min[i] && sensorValues[i] <= bruinsensors.Max[i]) {
 
       bruinsensors.detected[i] = true;
       bruinSeen = true;
@@ -279,6 +278,7 @@ int Lijnsensor::BruinPosition(int positie) {
 
 
 int Lijnsensor::bepaalRichting() {
+  return 0;
   // int positie = lineSensors.readLine(sensorValues);
   int positie = leesPositie();
 

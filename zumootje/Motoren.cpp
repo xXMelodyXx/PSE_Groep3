@@ -13,12 +13,12 @@ void Motoren :: initialiseer(Lijnsensor* l){
   for(int i = 0; i < 200; i++){
     delay(20);
     if(i <= 50 || i >= 150){
-      motors.setSpeeds(-300,300);
+      motors.setSpeeds(-400,400);
       //Serial1.print(i);
       l->simpelCalibreer();
     }
     else{
-      motors.setSpeeds(300,-300);
+      motors.setSpeeds(400,-400);
       //Serial1.println(i);
       l->simpelCalibreer();
     }
