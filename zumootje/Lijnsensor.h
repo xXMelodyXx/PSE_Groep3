@@ -23,6 +23,10 @@ private:
   Zumo32U4ButtonB buttonB;
   unsigned int sensorValues[5];
   int positie;
+
+  bool grijsLinks = false;
+  bool grijsRechts = false;
+  bool grijsActief = false;
   
 
   sensordata groensensors;
@@ -56,4 +60,8 @@ public:
   int GrijsPosition(sensordata);
   //int BruinPosition(sensordata);
   int bepaalRichting();
+  bool handleGrijsTape(Motoren);
+
+
+  void resetGrijs();
 };

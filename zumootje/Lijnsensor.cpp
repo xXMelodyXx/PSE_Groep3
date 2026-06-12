@@ -191,15 +191,20 @@ int Lijnsensor::GrijsPosition(sensordata meting) {
 
     if (grijssensors.detected[0]) {
       if (zwartsensors.detected[0]) {
+        grijsLinks = true;
+        grijsRechts = false;
+        grijsActief = true;
         return 2;
       }
     }
     if (grijssensors.detected[4]) {
       if (zwartsensors.detected[4]) {
+        grijsRechts = true;
+        grijsLinks = false;
+        grijsActief = true;
         return 3;
       }
     }
-    
   }
   return -1;
 }
@@ -239,6 +244,30 @@ bool Lijnsensor::BruinDetected(sensordata meting) {
 
   return bruinSeen;
 }
+/*
+void Lijnsensor::setGrijsLinks() {
+  grijsLinksGezien = true;
+  grijsRechtsGezien = false;
+}
+
+void Lijnsensor::setGrijsRechts() {
+  grijsRechtsGezien = true;
+  grijsLinksGezien = false;
+}
+
+bool Lijnsensor::isGrijsLinks() {
+  return grijsLinksGezien;
+}
+
+bool Lijnsensor::isGrijsRechts() {
+  return grijsRechtsGezien;
+}
+
+void Lijnsensor::resetGrijs() {
+  grijsLinksGezien = false;
+  grijsRechtsGezien = false;
+}
+*/
 
 
 bool Lijnsensor::zwartKruispunt() {
@@ -251,40 +280,68 @@ bool Lijnsensor::zwartKruispunt() {
   return linksZwart && rechtsZwart;
 }
 
+bool Lijnsensor::handleGrijsTape(Motoren motoren) {
+
+  if (!grijsActief){
+    return false;
+  }
+
+  if(!zwartKruispunt()){
+    return false;
+  }
+
+  if (grijsLinks) {
+    motoren.setSpeed(-180, 220);
+  }
+
+  if (grijsRechts) {
+    motoren.setSpeed(220, -180);
+  }
+
+  delay(250);
+
+  grijsLinks = false;
+  grijsRechts = false;
+  grijsActief = false;
+
+  return true;
+}
+
 
 int Lijnsensor::bepaalRichting() {
   sensordata meting = getGemiddelde(1);
-  
-   if (buttonB.isPressed()) {
+
+  if (buttonB.isPressed()) {
     return 10;
   }
 
   if (GrijsPosition(meting) == 2) {
+
     return 2;
   }
   if (GrijsPosition(meting) == 3) {
     return 3;
   }
-  // if (GrijsPosition(meting) == 6) {
-  //   return 6;
-  // }
+  if (GrijsPosition(meting) == 6) {
+    return 6;
+  }
   if (helling.hellingGedetecteerd()) {
     return 5;
   }
 
-  
+
   if (ZwartDetected(meting)) {
     return 0;
   }
   if (GroenDetected(meting)) {
     return 1;
   }
-  
+
   if (BruinDetected(meting)) {
     return 4;
   }
-  
-  
- 
+
+
+
   return -1;
 }

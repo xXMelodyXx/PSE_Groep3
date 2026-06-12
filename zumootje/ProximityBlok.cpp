@@ -83,7 +83,7 @@ void ProximityBlok::zoekBlok() {
 
     int sterkte = links + rechts;
     long huidigeTicks = gemiddeldeTicks();
-
+  /*
     Serial1.print("Links: ");
     Serial1.print(links);
     Serial1.print(" Rechts: ");
@@ -92,7 +92,7 @@ void ProximityBlok::zoekBlok() {
     Serial1.print(sterkte);
     Serial1.print(" Ticks: ");
     Serial1.println(huidigeTicks);
-
+  */
     // Blok wordt gezien als minimaal 1 sensor een waarde geeft
     if (links >= objectMinWaarde || rechts >= objectMinWaarde) {
       blokGezien = true;
@@ -165,8 +165,6 @@ bool ProximityBlok::BrownDetected() {
 
   int gemiddelde = (sensorValues[1] + sensorValues[2] + sensorValues[3]) / 3;
 
-  Serial1.print("Lijn gemiddelde: ");
-  Serial1.println(gemiddelde);
 
   if (gemiddelde >= bruinMinWaarde && gemiddelde <= bruinMaxWaarde) {
     return true;
@@ -180,8 +178,7 @@ bool ProximityBlok::BlackDetected() {
 
   int gemiddelde = (sensorValues[1] + sensorValues[2] + sensorValues[3]) / 3;
 
-  Serial1.print("Lijn gemiddelde: ");
-  Serial1.println(gemiddelde);
+  
 
   if (gemiddelde >= zwartMinWaarde) {
     return true;

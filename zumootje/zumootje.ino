@@ -24,13 +24,13 @@ ProximityBlok proxBlok(&motoren);
 Lijnsensor lijnsensor(&xb, &proxBlok);
 
 
-int BASE_SPEED = 250;  // basissnelheid
-int MAX_SPEED = 400;   // maximale motorsnelheid
-int MIN_SPEED = -400;  // minimale motorsnelheid
+double BASE_SPEED = 200.0;  // basissnelheid
+double MAX_SPEED = 400.0;   // maximale motorsnelheid
+double MIN_SPEED = -400.0;  // minimale motorsnelheid
 //0.6
-const float KP = 0.62; 
+const float KP = 0.63; 
 const float KI = 0;    
-const float KD = 0.1;    
+const float KD = 0;    
 
 // PID variabelen
 float prevError = 0;
@@ -42,6 +42,7 @@ void rijdenMetPID(bool groendetected, bool hellingdetected) {
 
   float error = positie - 3000;
 
+  //niet gebruikt
   integral += error;
   integral = constrain(integral, -5000, 5000);
 
@@ -56,8 +57,8 @@ void rijdenMetPID(bool groendetected, bool hellingdetected) {
     motoren.setSpeed(linksSnelheid, rechtsSnelheid);
   }
   if (groendetected) {
-    int linksSnelheid = constrain((int)(BASE_SPEED / 2 + correctie), MIN_SPEED / 2, MAX_SPEED );
-    int rechtsSnelheid = constrain((int)(BASE_SPEED / 2 - correctie), MIN_SPEED / 2, MAX_SPEED);
+    int linksSnelheid = constrain((int)(BASE_SPEED / 1.3 + correctie), MIN_SPEED / 1.3, MAX_SPEED );
+    int rechtsSnelheid = constrain((int)(BASE_SPEED / 1.3 - correctie), MIN_SPEED / 1.3, MAX_SPEED);
     motoren.setSpeed(linksSnelheid, rechtsSnelheid);
   }
   if(hellingdetected){
@@ -85,28 +86,16 @@ void setup() {
   xb.begin();
 }
 
+
 void loop() {
 
-  int keuze = lijnsensor.bepaalRichting();
-
-  if (grijsKeuze != GEEN_GRIJS && lijnsensor.zwartKruispunt()) {
-
-    if (grijsKeuze == GRIJS_LINKS) {
-      xb.print("Grijs links onthouden -> links op kruising");
-      motoren.setSpeed(-100, 200);
-      delay(400);
-    }
-
-    if (grijsKeuze == GRIJS_RECHTS) {
-      xb.print("Grijs rechts onthouden -> rechts op kruising");
-      motoren.setSpeed(200, -100);
-      delay(400);
-    }
-
-    grijsKeuze = GEEN_GRIJS;
+   if (lijnsensor.handleGrijsTape(motoren)) {
     return;
   }
 
+  int keuze = lijnsensor.bepaalRichting();
+ 
+ 
   switch (keuze) {
    
 
@@ -126,16 +115,15 @@ void loop() {
 
     case 2:
       //Grijs Links
-      grijsKeuze = GRIJS_LINKS;
+      
       rijdenMetPID(false, false);
-      //motoren.setSpeed(50, 200);
+     
       xb.print("case 2: Grijs Links");
       break;
 
     case 3:
       //Grijs Rechts
-      grijsKeuze = GRIJS_RECHTS;
-      //motoren.setSpeed(200, 50);
+      
       rijdenMetPID(false, false);
       xb.print("case 2: Grijs rechts");
       break;
