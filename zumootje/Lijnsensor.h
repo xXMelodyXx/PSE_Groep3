@@ -46,12 +46,11 @@ public:
   int leesPositie();
   void simpelCalibreer();
   sensordata getGemiddelde(int hoeveelMetingen);
-  bool GrijsDetected();
-  bool GroenDetected();
-  bool BruinDetected();
-  bool ZwartDetected();
-  int GrijsPosition(int positie);
-  int GroenPosition(int positie);
-  int BruinPosition(int positie);
+  bool GrijsDetected(sensordata);
+  bool GroenDetected(sensordata);
+  bool BruinDetected(sensordata);
+  bool ZwartDetected(sensordata);
+  int GrijsPosition(sensordata);
+  int BruinPosition(sensordata);
   int bepaalRichting();
 };

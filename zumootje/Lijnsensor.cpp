@@ -145,9 +145,7 @@ void Lijnsensor::calibrateBruin() {
   }
 }
 
-bool Lijnsensor::ZwartDetected() {
-
-  lineSensors.readCalibrated(sensorValues);
+bool Lijnsensor::ZwartDetected(sensordata meting) {
 
   for (int i = 0; i < 5; i++) {
     zwartsensors.detected[i] = false;
@@ -156,7 +154,7 @@ bool Lijnsensor::ZwartDetected() {
   bool zwartSeen = false;
 
   for (int i = 0; i < 5; i++) {
-    if (sensorValues[i] >= zwartsensors.Min[i] && sensorValues[i] <= zwartsensors.Max[i]) {
+    if (meting.Gemiddelde[i] >= zwartsensors.Min[i] && meting.Gemiddelde[i] <= zwartsensors.Max[i]) {
 
       zwartsensors.detected[i] = true;
       zwartSeen = true;
@@ -166,9 +164,7 @@ bool Lijnsensor::ZwartDetected() {
   return zwartSeen;
 }
 
-bool Lijnsensor::GrijsDetected() {
-
-  lineSensors.readCalibrated(sensorValues);
+bool Lijnsensor::GrijsDetected(sensordata meting) {
 
   for (int i = 0; i < 5; i++) {
     grijssensors.detected[i] = false;
@@ -177,7 +173,7 @@ bool Lijnsensor::GrijsDetected() {
   bool grijsSeen = false;
 
   for (int i = 0; i < 5; i++) {
-    if (sensorValues[i] >= grijssensors.Min[i] && sensorValues[i] <= grijssensors.Max[i]) {
+    if (meting.Gemiddelde[i] >= grijssensors.Min[i] && meting.Gemiddelde[i] <= grijssensors.Max[i]) {
 
       grijssensors.detected[i] = true;
       grijsSeen = true;
@@ -187,36 +183,35 @@ bool Lijnsensor::GrijsDetected() {
   return grijsSeen;
 }
 
-int Lijnsensor::GrijsPosition(int positie) {
-  if (GrijsDetected()) {
+int Lijnsensor::GrijsPosition(sensordata meting) {
+  if (GrijsDetected(meting)) {
     if (grijssensors.detected[0] && grijssensors.detected[4]) {
-      return 10;
+      return 6;
     }
 
     if (grijssensors.detected[0]) {
-      return 1;
+      if (zwartsensors.detected[0]) {
+        return 2;
+      }
     }
-
     if (grijssensors.detected[4]) {
-      return 2;
+      if (zwartsensors.detected[4]) {
+        return 3;
+      }
     }
+    return -1;
   }
-  //erbij gezet Melody
-  return 0;
 }
 
-bool Lijnsensor::GroenDetected() {
-
-  lineSensors.readCalibrated(sensorValues);
+bool Lijnsensor::GroenDetected(sensordata meting) {
 
   for (int i = 0; i < 5; i++) {
     groensensors.detected[i] = false;
   }
 
   bool groenSeen = false;
-
   for (int i = 0; i < 5; i++) {
-    if (sensorValues[i] >= groensensors.Min[i] && sensorValues[i] <= groensensors.Max[i]) {
+    if (meting.Gemiddelde[i] >= groensensors.Min[i] && meting.Gemiddelde[i] <= groensensors.Max[i]) {
 
       groensensors.detected[i] = true;
       groenSeen = true;
@@ -226,35 +221,15 @@ bool Lijnsensor::GroenDetected() {
   return groenSeen;
 }
 
-// als er teveel afwijking is grijssensors.detected[1] & grijssensors.detected[3] toevoegen
-int Lijnsensor::GroenPosition(int positie) {
-  if (GroenDetected()) {
-    if (groensensors.detected[0]) {
-      return 1;
-    }
-
-    if (groensensors.detected[4]) {
-      return 2;
-    }
-
-    if ((groensensors.detected[2]) && (!groensensors.detected[0]) && (!groensensors.detected[4])) {
-      return 5;
-    }
-  }
-}
-
-bool Lijnsensor::BruinDetected() {
-
-  lineSensors.readCalibrated(sensorValues);
+bool Lijnsensor::BruinDetected(sensordata meting) {
 
   for (int i = 0; i < 5; i++) {
     bruinsensors.detected[i] = false;
   }
-
   bool bruinSeen = false;
 
   for (int i = 0; i < 5; i++) {
-    if (sensorValues[i] >= bruinsensors.Min[i] && sensorValues[i] <= bruinsensors.Max[i]) {
+    if (meting.Gemiddelde[i] >= bruinsensors.Min[i] && meting.Gemiddelde[i] <= bruinsensors.Max[i]) {
 
       bruinsensors.detected[i] = true;
       bruinSeen = true;
@@ -264,58 +239,32 @@ bool Lijnsensor::BruinDetected() {
   return bruinSeen;
 }
 
-// eventueel uit proberen zonder BruinPosition alleen met Bool naar Bepaalrichting
-// Staat nu extra erin voor extra nauwkeurigheid
-int Lijnsensor::BruinPosition(int positie) {
-  if (BruinDetected()) {
-    if (bruinsensors.detected[0] && bruinsensors.detected[4]) {
-      return 6;
-    }
-  }
-}
-
-
-
-
 int Lijnsensor::bepaalRichting() {
-  return 0;
-  // int positie = lineSensors.readLine(sensorValues);
-  int positie = leesPositie();
+  sensordata meting = getGemiddelde(1);
 
-  if (buttonB.isPressed()) {
-    return 11;
-  }
-  if (GroenPosition(positie) == 5) {
-    return 5;
-  }
-
-  if (BruinPosition(positie) == 6) {
-    return 6;
-  }
-
-  // if (GrijsPosition(positie) == 10) {
-  //   return 10;
-  // }
-
-  if (positie < 300) {  //|| (GrijsPosition(positie) == 1)) {
+  if (GroenDetected(meting) {
     return 1;
   }
-
-  if (positie > 3700) {  // || (GrijsPosition(positie) == 2)) {
+  if (ZwartDetected(meting)) {
+    return 0;
+  }
+  if (GrijsPosition(meting) == 2) {
     return 2;
   }
-
-  if (positie < 1500) {
+  if (GrijsPosition(meting) == 3) {
     return 3;
   }
-
-  if (positie > 2500) {
+  if (BruinDetected()) {
     return 4;
   }
-
-
-
-
-
-  return 0;
+  if (helling.hellingGedetecteerd()) {
+    return 5;
+  }
+  if (GrijsPosition(meting) == 6) {
+    return 6;
+  }
+  if (buttonB.isPressed()) {
+    return 10;
+  }
+  return -1;
 }
