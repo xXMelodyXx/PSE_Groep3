@@ -37,13 +37,14 @@ private:
   bool BrownDetected();
   bool BlackDetected();
 
-  void leesProximity(int links, int rechts);
+  
   long gemiddeldeTicks();
 
   void stopVoorAltijd();
 
 public:
   ProximityBlok(Motoren* m);
+  void leesProximity(int links, int rechts);
 
   void init();
   void start();

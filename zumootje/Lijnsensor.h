@@ -23,12 +23,13 @@ private:
   Zumo32U4ButtonB buttonB;
   unsigned int sensorValues[5];
   int positie;
+  
 
   sensordata groensensors;
   sensordata grijssensors;
   sensordata bruinsensors;
   sensordata zwartsensors;
-  sensordata calibreer(String kleur);
+  
   int hoeveelMetingen;
   Xbee* xb;
   Zumo32U4ButtonC buttonC;
@@ -45,12 +46,14 @@ public:
   void calibrateGrijs();
   int leesPositie();
   void simpelCalibreer();
+  sensordata calibreer(String kleur);
   sensordata getGemiddelde(int hoeveelMetingen);
   bool GrijsDetected(sensordata);
   bool GroenDetected(sensordata);
   bool BruinDetected(sensordata);
   bool ZwartDetected(sensordata);
+  bool zwartKruispunt();
   int GrijsPosition(sensordata);
-  int BruinPosition(sensordata);
+  //int BruinPosition(sensordata);
   int bepaalRichting();
 };

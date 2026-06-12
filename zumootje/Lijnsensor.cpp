@@ -199,8 +199,9 @@ int Lijnsensor::GrijsPosition(sensordata meting) {
         return 3;
       }
     }
-    return -1;
+    
   }
+  return -1;
 }
 
 bool Lijnsensor::GroenDetected(sensordata meting) {
@@ -239,30 +240,47 @@ bool Lijnsensor::BruinDetected(sensordata meting) {
   return bruinSeen;
 }
 
+
+bool Lijnsensor::zwartKruispunt() {
+  sensordata meting = getGemiddelde(1);
+  ZwartDetected(meting);
+
+  bool linksZwart = zwartsensors.detected[0] || zwartsensors.detected[1];
+  bool rechtsZwart = zwartsensors.detected[3] || zwartsensors.detected[4];
+
+  return linksZwart && rechtsZwart;
+}
+
+
 int Lijnsensor::bepaalRichting() {
   sensordata meting = getGemiddelde(1);
 
-  if (GroenDetected(meting) {
-    return 1;
-  }
-  if (ZwartDetected(meting)) {
-    return 0;
-  }
   if (GrijsPosition(meting) == 2) {
     return 2;
   }
   if (GrijsPosition(meting) == 3) {
     return 3;
   }
-  if (BruinDetected()) {
-    return 4;
-  }
+  // if (GrijsPosition(meting) == 6) {
+  //   return 6;
+  // }
   if (helling.hellingGedetecteerd()) {
     return 5;
   }
-  if (GrijsPosition(meting) == 6) {
-    return 6;
+
+  
+  if (ZwartDetected(meting)) {
+    return 0;
   }
+  if (GroenDetected(meting)) {
+    return 1;
+  }
+  
+  if (BruinDetected(meting)) {
+    return 4;
+  }
+  
+  
   if (buttonB.isPressed()) {
     return 10;
   }
