@@ -254,6 +254,10 @@ bool Lijnsensor::zwartKruispunt() {
 
 int Lijnsensor::bepaalRichting() {
   sensordata meting = getGemiddelde(1);
+  
+   if (buttonB.isPressed()) {
+    return 10;
+  }
 
   if (GrijsPosition(meting) == 2) {
     return 2;
@@ -281,8 +285,6 @@ int Lijnsensor::bepaalRichting() {
   }
   
   
-  if (buttonB.isPressed()) {
-    return 10;
-  }
+ 
   return -1;
 }

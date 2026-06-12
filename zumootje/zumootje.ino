@@ -24,13 +24,13 @@ ProximityBlok proxBlok(&motoren);
 Lijnsensor lijnsensor(&xb, &proxBlok);
 
 
-int BASE_SPEED = 200;  // basissnelheid
+int BASE_SPEED = 250;  // basissnelheid
 int MAX_SPEED = 400;   // maximale motorsnelheid
 int MIN_SPEED = -400;  // minimale motorsnelheid
-
-const float KP = 0.6; 
+//0.6
+const float KP = 0.62; 
 const float KI = 0;    
-const float KD = 0;    
+const float KD = 0.1;    
 
 // PID variabelen
 float prevError = 0;
@@ -56,8 +56,8 @@ void rijdenMetPID(bool groendetected, bool hellingdetected) {
     motoren.setSpeed(linksSnelheid, rechtsSnelheid);
   }
   if (groendetected) {
-    int linksSnelheid = constrain((int)(BASE_SPEED / 2 + correctie), MIN_SPEED / 2, MAX_SPEED / 2);
-    int rechtsSnelheid = constrain((int)(BASE_SPEED / 2 - correctie), MIN_SPEED / 2, MAX_SPEED / 2);
+    int linksSnelheid = constrain((int)(BASE_SPEED / 2 + correctie), MIN_SPEED / 2, MAX_SPEED );
+    int rechtsSnelheid = constrain((int)(BASE_SPEED / 2 - correctie), MIN_SPEED / 2, MAX_SPEED);
     motoren.setSpeed(linksSnelheid, rechtsSnelheid);
   }
   if(hellingdetected){
@@ -93,13 +93,13 @@ void loop() {
 
     if (grijsKeuze == GRIJS_LINKS) {
       xb.print("Grijs links onthouden -> links op kruising");
-      motoren.setSpeed(-150, 200);
+      motoren.setSpeed(-100, 200);
       delay(400);
     }
 
     if (grijsKeuze == GRIJS_RECHTS) {
       xb.print("Grijs rechts onthouden -> rechts op kruising");
-      motoren.setSpeed(200, -150);
+      motoren.setSpeed(200, -100);
       delay(400);
     }
 
@@ -136,6 +136,7 @@ void loop() {
       //Grijs Rechts
       grijsKeuze = GRIJS_RECHTS;
       //motoren.setSpeed(200, 50);
+      rijdenMetPID(false, false);
       xb.print("case 2: Grijs rechts");
       break;
 
