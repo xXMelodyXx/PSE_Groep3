@@ -62,7 +62,7 @@ void XBeeControl::rijden(char toets) {
 
   // Links draaien
   else if (toets == 'A') {
-    motors.setSpeeds(0, 400);
+    motors.setSpeeds(0, 200);
   }
 
   // Rechts draaien
