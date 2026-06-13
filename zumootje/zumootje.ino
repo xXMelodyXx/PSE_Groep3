@@ -93,7 +93,7 @@ void loop() {
     return;
   }
 
-  int keuze = lijnsensor.bepaalRichting();
+  int keuze = lijnsensor.bepaalCase();
  
  
   switch (keuze) {

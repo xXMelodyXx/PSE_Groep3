@@ -308,7 +308,7 @@ bool Lijnsensor::handleGrijsTape(Motoren motoren) {
 }
 
 
-int Lijnsensor::bepaalRichting() {
+int Lijnsensor::bepaalCase() {
   sensordata meting = getGemiddelde(1);
 
   if (buttonB.isPressed()) {
@@ -328,7 +328,6 @@ int Lijnsensor::bepaalRichting() {
   if (helling.hellingGedetecteerd()) {
     return 5;
   }
-
 
   if (ZwartDetected(meting)) {
     return 0;
