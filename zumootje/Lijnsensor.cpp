@@ -122,8 +122,8 @@ void Lijnsensor::calibrateGroen() {
   sensordata tempGroen = calibreer("groen");
   for (int i = 0; i < NMRSENSOR; i++) {
     groensensors.Gemiddelde[i] = tempGroen.Gemiddelde[i];
-    groensensors.Min[i] = tempGroen.Min[i] * 0.5;  //toepassing correctie
-    groensensors.Max[i] = tempGroen.Max[i] * 1.5;
+    groensensors.Min[i] = tempGroen.Min[i] * 0.6;  //toepassing correctie
+    groensensors.Max[i] = tempGroen.Max[i] * 1.4;
   }
 }
 
@@ -131,8 +131,8 @@ void Lijnsensor::calibrateGrijs() {
   sensordata tempGrijs = calibreer("grijs");
   for (int i = 0; i < NMRSENSOR; i++) {
     grijssensors.Gemiddelde[i] = tempGrijs.Gemiddelde[i];
-    grijssensors.Min[i] = tempGrijs.Min[i] * 0.5;  //toepassing correctie
-    grijssensors.Max[i] = tempGrijs.Max[i] * 1.5;
+    grijssensors.Min[i] = tempGrijs.Min[i] * 0.9;  //toepassing correctie
+    grijssensors.Max[i] = tempGrijs.Max[i] * 1.1;
   }
 }
 
@@ -140,8 +140,8 @@ void Lijnsensor::calibrateBruin() {
   sensordata tempBruin = calibreer("bruin");
   for (int i = 0; i < NMRSENSOR; i++) {
     bruinsensors.Gemiddelde[i] = tempBruin.Gemiddelde[i];
-    bruinsensors.Min[i] = tempBruin.Min[i] * 0.5;  //toepassing correctie
-    bruinsensors.Max[i] = tempBruin.Max[i] * 1.5;
+    bruinsensors.Min[i] = tempBruin.Min[i] * 0.8;  //toepassing correctie
+    bruinsensors.Max[i] = tempBruin.Max[i] * 1.2;
   }
 }
 
@@ -191,17 +191,17 @@ int Lijnsensor::GrijsPosition(sensordata meting) {
 
     if (grijssensors.detected[0]) {
       if (zwartsensors.detected[0]) {
-        grijsLinks = true;
-        grijsRechts = false;
-        grijsActief = true;
+        // grijsLinks = true;
+        // grijsRechts = false;
+        // grijsActief = true;
         return 2;
       }
     }
     if (grijssensors.detected[4]) {
       if (zwartsensors.detected[4]) {
-        grijsRechts = true;
-        grijsLinks = false;
-        grijsActief = true;
+        // grijsRechts = true;
+        // grijsLinks = false;
+        // grijsActief = true;
         return 3;
       }
     }
@@ -244,49 +244,26 @@ bool Lijnsensor::BruinDetected(sensordata meting) {
 
   return bruinSeen;
 }
-/*
-void Lijnsensor::setGrijsLinks() {
-  grijsLinksGezien = true;
-  grijsRechtsGezien = false;
-}
-
-void Lijnsensor::setGrijsRechts() {
-  grijsRechtsGezien = true;
-  grijsLinksGezien = false;
-}
-
-bool Lijnsensor::isGrijsLinks() {
-  return grijsLinksGezien;
-}
-
-bool Lijnsensor::isGrijsRechts() {
-  return grijsRechtsGezien;
-}
-
-void Lijnsensor::resetGrijs() {
-  grijsLinksGezien = false;
-  grijsRechtsGezien = false;
-}
-*/
 
 
 bool Lijnsensor::zwartKruispunt() {
   sensordata meting = getGemiddelde(1);
   ZwartDetected(meting);
 
-  bool linksZwart = zwartsensors.detected[0] || zwartsensors.detected[1];
-  bool rechtsZwart = zwartsensors.detected[3] || zwartsensors.detected[4];
+  bool linksZwart = zwartsensors.detected[0];
+  bool rechtsZwart = zwartsensors.detected[4];
 
   return linksZwart && rechtsZwart;
 }
 
+/*
 bool Lijnsensor::handleGrijsTape(Motoren motoren) {
 
-  if (!grijsActief){
+  if (!grijsActief) {
     return false;
   }
 
-  if(!zwartKruispunt()){
+  if (!zwartKruispunt()) {
     return false;
   }
 
@@ -306,14 +283,11 @@ bool Lijnsensor::handleGrijsTape(Motoren motoren) {
 
   return true;
 }
-
+*/
 
 int Lijnsensor::bepaalCase() {
   sensordata meting = getGemiddelde(1);
 
-  if (buttonB.isPressed()) {
-    return 10;
-  }
 
   if (GrijsPosition(meting) == 2) {
 
@@ -322,25 +296,31 @@ int Lijnsensor::bepaalCase() {
   if (GrijsPosition(meting) == 3) {
     return 3;
   }
-  if (GrijsPosition(meting) == 6) {
-    return 6;
-  }
+ 
   if (helling.hellingGedetecteerd()) {
     return 5;
+  }
+   if (GrijsPosition(meting) == 6) {
+    return 6;
   }
 
   if (ZwartDetected(meting)) {
     return 0;
   }
+
   if (GroenDetected(meting)) {
     return 1;
   }
 
-  if (BruinDetected(meting)) {
+  if (BruinDetected(meting) == 4) {
     return 4;
   }
 
+  if(!ZwartDetected(meting) && !GroenDetected(meting) && !BruinDetected(meting) && !GrijsDetected(meting)) {
+          return 13; //print case 13
+    }
 
 
-  return -1;
+
+  //return -1;
 }

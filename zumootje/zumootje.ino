@@ -27,16 +27,16 @@ Lijnsensor lijnsensor(&xb, &proxBlok);
 double BASE_SPEED = 200.0;  // basissnelheid
 double MAX_SPEED = 400.0;   // maximale motorsnelheid
 double MIN_SPEED = -400.0;  // minimale motorsnelheid
-//0.6
+//0.6, 0.63, 
 const float KP = 0.63; 
-const float KI = 0;    
-const float KD = 0;    
+const float KI = 0.0;    
+const float KD = 0.0;   
 
 // PID variabelen
 float prevError = 0;
 float integral = 0;
 
-void rijdenMetPID(bool groendetected, bool hellingdetected) {
+void rijdenMetPID(bool groendetected, bool hellingdetected, bool grijsLinks, bool grijsRechts) {
   int positie = lijnsensor.leesPositie();
 
 
@@ -66,6 +66,17 @@ void rijdenMetPID(bool groendetected, bool hellingdetected) {
     int rechtsSnelheid = constrain((int)(BASE_SPEED * 2 - correctie), MIN_SPEED, MAX_SPEED);
     motoren.setSpeed(linksSnelheid, rechtsSnelheid);
   }
+  if(grijsLinks){
+    int linksSnelheid = constrain((int)(BASE_SPEED / 2.9  + correctie), MIN_SPEED, MAX_SPEED);
+    int rechtsSnelheid = constrain((int)(BASE_SPEED * 1.2 - correctie), MIN_SPEED, MAX_SPEED);
+    motoren.setSpeed(linksSnelheid, rechtsSnelheid);
+  }
+
+  if(grijsRechts){
+    int linksSnelheid = constrain((int)(BASE_SPEED * 1.2  + correctie), MIN_SPEED, MAX_SPEED);
+    int rechtsSnelheid = constrain((int)(BASE_SPEED / 2.9 - correctie), MIN_SPEED, MAX_SPEED);
+    motoren.setSpeed(linksSnelheid, rechtsSnelheid);
+  }
 
   
 }
@@ -88,12 +99,31 @@ void setup() {
 
 
 void loop() {
+  int keuze = lijnsensor.bepaalCase();
 
-   if (lijnsensor.handleGrijsTape(motoren)) {
-    return;
+  if (grijsKeuze != GEEN_GRIJS && lijnsensor.zwartKruispunt()) {
+
+    if (grijsKeuze == GRIJS_LINKS) {
+      xb.print("Grijs links onthouden -> links op kruising");
+      motoren.setSpeed(-100, 200);
+
+      //rijdenMetPID(false,false,true,false);
+      delay(2000);
+    }
+
+    if (grijsKeuze == GRIJS_RECHTS) {
+      xb.print("Grijs rechts onthouden -> rechts op kruising");
+      //rijdenMetPID(false, false,false,true);
+      motoren.setSpeed(200, -100);
+      delay(2000);
+    }
+
+    grijsKeuze = GEEN_GRIJS;
   }
 
-  int keuze = lijnsensor.bepaalCase();
+   
+
+
  
  
   switch (keuze) {
@@ -101,49 +131,53 @@ void loop() {
 
     case 0:
       //Zwarte lijn volgen
-      rijdenMetPID(false, false);
-      xb.print("case 0 : Zwart gedetecteerd");
+      rijdenMetPID(false, false,false,false);
+      //xb.print("case 0 : Zwart gedetecteerd");
       break;
 
 
     case 1:
       //Groene lijn volgen
       //groendetected = true;
-      rijdenMetPID(true, false);
-      xb.print("case 1: Groen gedetecteerd");
+      rijdenMetPID(true, false,false,false);
+     // xb.print("case 1: Groen gedetecteerd");
       break;
 
     case 2:
       //Grijs Links
-      
-      rijdenMetPID(false, false);
+      grijsKeuze = GRIJS_LINKS;
+      rijdenMetPID(false, false,true,false);
      
       xb.print("case 2: Grijs Links");
       break;
 
     case 3:
       //Grijs Rechts
-      
-      rijdenMetPID(false, false);
+      grijsKeuze = GRIJS_RECHTS;
+      rijdenMetPID(false, false,false,true);
       xb.print("case 2: Grijs rechts");
       break;
 
     case 4:
       //Bruin gedetecteerd, start zoeken en duwen van blokje.
       proxBlok.start();
+      // xb.print("case 4: Bruin gedetecteerd");
+      //proxBlok.zoekBlok();
+     
       break;
 
     case 5:
       //Helling gedetecteerd, sneller rijden.
-      rijdenMetPID(false, true);
-      xb.print("case 4 : Helling gedetecteerd");
+      rijdenMetPID(false, true,false,false);
+     // xb.print("case 4 : Helling gedetecteerd");
       break;
 
     case 6:
       //Grijs stoppen voor 2 seconden.
       motoren.stop();
       delay(2000);
-      xb.print("case 6: Stoppen en balanceren ");
+      rijdenMetPID(false, false, false, false);
+     xb.print("case 6: Stoppen en balanceren ");
       break;
 
     case 11:
@@ -155,8 +189,13 @@ void loop() {
         motoren.stop();
         delay(50);
       }
-      Serial1.println("Hervat!");
+   //   Serial1.println("Hervat!");
 
+      break;
+    //TODO fixen, voor stippellijnen
+    case 13: 
+
+      motoren.setSpeed(100,100);
       break;
 
     default:
