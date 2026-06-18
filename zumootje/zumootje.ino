@@ -114,7 +114,7 @@ void loop() {
     if (grijsKeuze == GRIJS_RECHTS) {
       xb.print("Grijs rechts onthouden -> rechts op kruising");
       //rijdenMetPID(false, false,false,true);
-      motoren.setSpeed(200, -100);
+      motoren.setSpeed(250, -100); //200, -100
       delay(2000);
     }
 
@@ -161,7 +161,7 @@ void loop() {
     case 4:
       //Bruin gedetecteerd, start zoeken en duwen van blokje.
       proxBlok.start();
-      // xb.print("case 4: Bruin gedetecteerd");
+      xb.print("case 4: Bruin gedetecteerd");
       //proxBlok.zoekBlok();
      
       break;
@@ -169,6 +169,7 @@ void loop() {
     case 5:
       //Helling gedetecteerd, sneller rijden.
       rijdenMetPID(false, true,false,false);
+
      // xb.print("case 4 : Helling gedetecteerd");
       break;
 
@@ -180,6 +181,11 @@ void loop() {
      xb.print("case 6: Stoppen en balanceren ");
       break;
 
+    case 7:
+    xb.print("case 7: groenlinks");
+      motoren.setSpeed(-100,200);
+      delay(1000);
+
     case 11:
       //stoppen als op knop B gedrukt.
 
@@ -189,13 +195,12 @@ void loop() {
         motoren.stop();
         delay(50);
       }
-   //   Serial1.println("Hervat!");
 
       break;
     //TODO fixen, voor stippellijnen
     case 13: 
-
       motoren.setSpeed(100,100);
+      delay(1000);
       break;
 
     default:

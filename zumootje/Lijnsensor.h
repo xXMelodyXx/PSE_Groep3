@@ -130,6 +130,8 @@ public:
    */
   bool zwartKruispunt();
 
+ // bool groenLinks();
+
   /*! 
     \brief Bepaalt de positie van het grijze tape
     \param data De sensordata

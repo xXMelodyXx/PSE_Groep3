@@ -245,6 +245,14 @@ bool Lijnsensor::BruinDetected(sensordata meting) {
   return bruinSeen;
 }
 
+/*
+bool Lijnsensor:: groenLinks(sensordata meting){
+  meting = getGemiddelde(1);
+  GroenDetected(meting);
+  return groensensors.detected[0];
+}
+*/
+
 
 bool Lijnsensor::zwartKruispunt() {
   sensordata meting = getGemiddelde(1);
@@ -255,35 +263,6 @@ bool Lijnsensor::zwartKruispunt() {
 
   return linksZwart && rechtsZwart;
 }
-
-/*
-bool Lijnsensor::handleGrijsTape(Motoren motoren) {
-
-  if (!grijsActief) {
-    return false;
-  }
-
-  if (!zwartKruispunt()) {
-    return false;
-  }
-
-  if (grijsLinks) {
-    motoren.setSpeed(-180, 220);
-  }
-
-  if (grijsRechts) {
-    motoren.setSpeed(220, -180);
-  }
-
-  delay(250);
-
-  grijsLinks = false;
-  grijsRechts = false;
-  grijsActief = false;
-
-  return true;
-}
-*/
 
 int Lijnsensor::bepaalCase() {
   sensordata meting = getGemiddelde(1);
@@ -296,17 +275,26 @@ int Lijnsensor::bepaalCase() {
   if (GrijsPosition(meting) == 3) {
     return 3;
   }
- 
+
   if (helling.hellingGedetecteerd()) {
     return 5;
+    if (!helling.hellingGedetecteerd()) {
+      delay(1500);
+      return 13;
+    }
   }
-   if (GrijsPosition(meting) == 6) {
+  if (GrijsPosition(meting) == 6) {
     return 6;
   }
 
   if (ZwartDetected(meting)) {
     return 0;
   }
+  /*
+  if(groenLinks()){
+    return 7;
+  }
+  */
 
   if (GroenDetected(meting)) {
     return 1;
@@ -316,9 +304,9 @@ int Lijnsensor::bepaalCase() {
     return 4;
   }
 
-  if(!ZwartDetected(meting) && !GroenDetected(meting) && !BruinDetected(meting) && !GrijsDetected(meting)) {
-          return 13; //print case 13
-    }
+  else {
+    return 0;
+  }
 
 
 
