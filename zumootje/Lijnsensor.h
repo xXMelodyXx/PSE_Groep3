@@ -5,7 +5,6 @@
 #include "Xbee.h"
 #include "Motoren.h"
 #include "Helling.h"
-#include "ProximityBlok.h"
 #define NMRSENSOR 5
 
 struct sensordata {
@@ -20,7 +19,7 @@ class Lijnsensor {
 private:
   Zumo32U4LineSensors lineSensors;
   Helling helling;
-  ProximityBlok* proximityBlok;
+  //ProximityBlok* proximityBlok;
   Zumo32U4ButtonB buttonB;
   unsigned int sensorValues[5];
   int positie;
@@ -45,7 +44,7 @@ public:
   *  \param xbee Pointer naar de Xbee klasse voor communicatie
   *  \param p Pointer toegevoegd voor toegang tot ProximityBlok functies
   */
-  Lijnsensor(Xbee* xbee, ProximityBlok* p);
+  Lijnsensor(Xbee* xbee);
 
   /*! 
   \brief Initialiseert de lijnsensor, inclusief kalibratie
@@ -144,6 +143,8 @@ public:
     \param motoren De motoren
    */
   bool handleGrijsTape(Motoren);
+
+  bool BruinLijn(sensordata);
 
 
   /*! 

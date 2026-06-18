@@ -4,29 +4,21 @@
 #include <Zumo32U4.h>
 #include "Motoren.h"
 
+//class Lijnsensor;
+
 class ProximityBlok {
 
 private:
-  Zumo32U4LineSensors lineSensors;
   Zumo32U4ProximitySensors proxSensors;
 
   Motoren* motoren;
-
-  unsigned int sensorValues[5];
+  Lijnsensor* lijnsensor;
 
   bool bruinAlGedetecteerd;
 
-  int rijSnelheid;
-  int draaiSnelheid;
   int duwSnelheid;
-
   long vooruitTicksNaBruin;
   long draai360Ticks;
-
-  int bruinMinWaarde;
-  int bruinMaxWaarde;
-  int zwartMinWaarde;
-
   int objectMinWaarde;
 
   void rijdVooruitTicks(long ticks);
@@ -34,17 +26,18 @@ private:
   void draaiTerug(long ticks);
   void duwTotZwart();
 
-  bool BrownDetected();
-  bool BlackDetected();
+  //bool BruinDetected();
+  //bool ZwartDetected();
 
-  
+  void leesProximity(int &links, int &rechts);
   long gemiddeldeTicks();
 
-  void stopVoorAltijd();
+  void stop();
 
 public:
-  ProximityBlok(Motoren* m);
-  void leesProximity(int links, int rechts);
+  ProximityBlok(Motoren* m, Lijnsensor* l);
+
+  //void setLijnsensor(Lijnsensor* l);
 
   void init();
   void start();

@@ -19,9 +19,10 @@ Zumo32U4ButtonA buttonA;
 
 Xbee xb;
 Motoren motoren;
-ProximityBlok proxBlok(&motoren);
 
-Lijnsensor lijnsensor(&xb, &proxBlok);
+
+Lijnsensor lijnsensor(&xb);
+ProximityBlok proxBlok(&motoren, &lijnsensor);
 
 
 double BASE_SPEED = 200.0;  // basissnelheid
@@ -67,8 +68,8 @@ void rijdenMetPID(bool groendetected, bool hellingdetected, bool grijsLinks, boo
     motoren.setSpeed(linksSnelheid, rechtsSnelheid);
   }
   if(grijsLinks){
-    int linksSnelheid = constrain((int)(BASE_SPEED / 2.9  + correctie), MIN_SPEED, MAX_SPEED);
-    int rechtsSnelheid = constrain((int)(BASE_SPEED * 1.2 - correctie), MIN_SPEED, MAX_SPEED);
+    int linksSnelheid = constrain((int)(BASE_SPEED / 2.9  + correctie), MIN_SPEED, MAX_SPEED); //2.9 
+    int rechtsSnelheid = constrain((int)(BASE_SPEED * 1.2 - correctie), MIN_SPEED, MAX_SPEED);//1.2
     motoren.setSpeed(linksSnelheid, rechtsSnelheid);
   }
 
@@ -89,6 +90,8 @@ void setup() {
   buttonC.waitForButton();
   lijnsensor.init();
   motoren.initialiseer(&lijnsensor);
+  proxBlok.init();
+
   lijnsensor.getCalibratie();
   xb.print("wait for button A");
   buttonA.waitForButton();
@@ -108,7 +111,7 @@ void loop() {
       motoren.setSpeed(-100, 200);
 
       //rijdenMetPID(false,false,true,false);
-      delay(2000);
+      delay(2500);
     }
 
     if (grijsKeuze == GRIJS_RECHTS) {
