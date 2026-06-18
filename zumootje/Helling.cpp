@@ -48,9 +48,6 @@ float Helling::geefHoek()
     return huidigeHoek;
 }
 
-float Helling :: getBeginHoek(){
-    return beginHoek;
-}
 
 bool Helling::hellingGedetecteerd()
 {

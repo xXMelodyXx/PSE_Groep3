@@ -5,6 +5,13 @@
 #include "Motoren.h"
 #include "ProximityBlok.h"
 
+enum GrijsKeuze {
+  GEEN_GRIJS,
+  GRIJS_LINKS,
+  GRIJS_RECHTS
+};
+
+GrijsKeuze grijsKeuze = GEEN_GRIJS;
 
 
 Zumo32U4ButtonC buttonC;
@@ -16,43 +23,66 @@ ProximityBlok proxBlok(&motoren);
 
 Lijnsensor lijnsensor(&xb, &proxBlok);
 
-//── PID instellingen ──────────────────────────────
-const int BASE_SPEED = 200;   // basissnelheid
-const int MAX_SPEED  = 400;   // maximale motorsnelheid
-const int MIN_SPEED  = -400;     // minimale motorsnelheid
 
-// Pas deze drie waarden aan tijdens testen:
-const float KP = 0.6;   // Proportioneel  – reageert op huidige fout
-const float KI = 0;    // Integraal      – compenseert aanhoudende fout
-//const float KD = 1.5;    // Differentieel  – dempt overshoot/slingeren
-// ─────────────────────────────────────────────────
+double BASE_SPEED = 200.0;  // basissnelheid
+double MAX_SPEED = 400.0;   // maximale motorsnelheid
+double MIN_SPEED = -400.0;  // minimale motorsnelheid
+//0.6, 0.63, 
+const float KP = 0.63; 
+const float KI = 0.0;    
+const float KD = 0.0;   
 
 // PID variabelen
-float prevError   = 0;
-float integral    = 0;
+float prevError = 0;
+float integral = 0;
 
-void rijdenMetPID() {
-  int positie = lijnsensor.leesPositie();  
+void rijdenMetPID(bool groendetected, bool hellingdetected, bool grijsLinks, bool grijsRechts) {
+  int positie = lijnsensor.leesPositie();
+
 
   float error = positie - 3000;
+
+  //niet gebruikt
   integral += error;
   integral = constrain(integral, -5000, 5000);
 
-  // Afgeleide
-  // float derivative = error - prevError;
-  // prevError = error;
-  float correctie = (KP * error) + (KI * integral);
+  float derivative = error - prevError;
+  prevError = error;
 
-  // Motorsnelheden berekenen
-  int linksSnelheid  = constrain((int)(BASE_SPEED + correctie), MIN_SPEED, MAX_SPEED);
-  int rechtsSnelheid = constrain((int)(BASE_SPEED - correctie), MIN_SPEED, MAX_SPEED);
+  float correctie = (KP * error) + (KI * integral) + (KD * derivative);
 
-  motoren.setSpeed(linksSnelheid, rechtsSnelheid);
+  if (!groendetected) {
+    int linksSnelheid = constrain((int)(BASE_SPEED + correctie), MIN_SPEED, MAX_SPEED);
+    int rechtsSnelheid = constrain((int)(BASE_SPEED - correctie), MIN_SPEED, MAX_SPEED);
+    motoren.setSpeed(linksSnelheid, rechtsSnelheid);
+  }
+  if (groendetected) {
+    int linksSnelheid = constrain((int)(BASE_SPEED / 1.3 + correctie), MIN_SPEED / 1.3, MAX_SPEED );
+    int rechtsSnelheid = constrain((int)(BASE_SPEED / 1.3 - correctie), MIN_SPEED / 1.3, MAX_SPEED);
+    motoren.setSpeed(linksSnelheid, rechtsSnelheid);
+  }
+  if(hellingdetected){
+    int linksSnelheid = constrain((int)(BASE_SPEED * 2 + correctie), MIN_SPEED, MAX_SPEED);
+    int rechtsSnelheid = constrain((int)(BASE_SPEED * 2 - correctie), MIN_SPEED, MAX_SPEED);
+    motoren.setSpeed(linksSnelheid, rechtsSnelheid);
+  }
+  if(grijsLinks){
+    int linksSnelheid = constrain((int)(BASE_SPEED / 2.9  + correctie), MIN_SPEED, MAX_SPEED);
+    int rechtsSnelheid = constrain((int)(BASE_SPEED * 1.2 - correctie), MIN_SPEED, MAX_SPEED);
+    motoren.setSpeed(linksSnelheid, rechtsSnelheid);
+  }
+
+  if(grijsRechts){
+    int linksSnelheid = constrain((int)(BASE_SPEED * 1.2  + correctie), MIN_SPEED, MAX_SPEED);
+    int rechtsSnelheid = constrain((int)(BASE_SPEED / 2.9 - correctie), MIN_SPEED, MAX_SPEED);
+    motoren.setSpeed(linksSnelheid, rechtsSnelheid);
+  }
+
+  
 }
 
 void setup() {
-  //calibreren van de benodigde kleuren
-  //Serial1.begin(9600);
+
   Serial1.begin(9600);
   xb.print("test");
   delay(2000);
@@ -60,131 +90,104 @@ void setup() {
   lijnsensor.init();
   motoren.initialiseer(&lijnsensor);
   lijnsensor.getCalibratie();
-
-  /*
-  xb.print("Leg de ZUMO op WIT");
-  xb.print("Druk op knop C om te starten");
-  while (buttonC.isPressed() == false) {}
-  delay(1000);
-  lijnsensor.calibrateWit();
-  xb.print("--------------------------------");
-  xb.print("Leg de ZUMO op ZWART");
-  xb.print("Druk op knop C om te scannen");
-  while (buttonC.isPressed() == false) {}
-  delay(1000);
-  lijnsensor.calibrateZwart();
-
-  xb.print("zwart gescand");
-  xb.print("Leg de ZUMO op Groen");
-  xb.print("Druk op knop C om te scannen");
-  while (buttonC.isPressed() == false) {}
-  delay(1000);
-  lijnsensor.calibrateGrijs();
-
-  xb.print("groen gescand");
-
-  xb.print("Leg de ZUMO op Bruin");
-  xb.print("Druk op knop C om te scannen");
-  while (buttonC.isPressed() == false) {}
-  delay(1000);
-  lijnsensor.calibrateBruin();
-
-  xb.print("bruin gescand");
-  xb.print("Leg de ZUMO op Grijs");
-  xb.print("Druk op knop C om te scannen");
-  while (buttonC.isPressed() == false) {}
-  delay(1000);
-  lijnsensor.calibrateGrijs();
-
-  xb.print("grijs gescand");
-
-*/
   xb.print("wait for button A");
   buttonA.waitForButton();
   xb.print("start!");
-  
 
   xb.begin();
 }
 
 
 void loop() {
+  int keuze = lijnsensor.bepaalCase();
+
+  if (grijsKeuze != GEEN_GRIJS && lijnsensor.zwartKruispunt()) {
+
+    if (grijsKeuze == GRIJS_LINKS) {
+      xb.print("Grijs links onthouden -> links op kruising");
+      motoren.setSpeed(-100, 200);
+
+      //rijdenMetPID(false,false,true,false);
+      delay(2000);
+    }
+
+    if (grijsKeuze == GRIJS_RECHTS) {
+      xb.print("Grijs rechts onthouden -> rechts op kruising");
+      //rijdenMetPID(false, false,false,true);
+      motoren.setSpeed(250, -100); //200, -100
+      delay(2000);
+    }
+
+    grijsKeuze = GEEN_GRIJS;
+  }
+
+   
 
 
-
-  //xbee.update();
-
-
-  int keuze = lijnsensor.bepaalRichting();
-
-
-
+ 
+ 
   switch (keuze) {
+   
 
     case 0:
-      //rechtdoor
-     // motoren.setSpeed(200, 200);
-     integral = 0;
-      rijdenMetPID();
-      xb.print("case 0 : RECHTDOOR");
+      //Zwarte lijn volgen
+      rijdenMetPID(false, false,false,false);
+      //xb.print("case 0 : Zwart gedetecteerd");
       break;
 
+
     case 1:
-      //SCHERPE LINKS
-      //motoren.setSpeed(0, 200);
-      integral = 0;
-      rijdenMetPID();
-      xb.print("case 1 : SCHERP LINKS");
+      //Groene lijn volgen
+      //groendetected = true;
+      rijdenMetPID(true, false,false,false);
+     // xb.print("case 1: Groen gedetecteerd");
       break;
 
     case 2:
-      //SCHERPE RECHTS
-      //motoren.setSpeed(200, 0);
-      integral = 0;
-      rijdenMetPID();
-      xb.print("case 2 : SCHERP RECHTS");
+      //Grijs Links
+      grijsKeuze = GRIJS_LINKS;
+      rijdenMetPID(false, false,true,false);
+     
+      xb.print("case 2: Grijs Links");
       break;
 
     case 3:
-      //SCHUINE LINKS
-      //motoren.setSpeed(50, 200);
-      integral = 0;
-      rijdenMetPID();
-      xb.print("case 3 : SCHUIN LINKS");
+      //Grijs Rechts
+      grijsKeuze = GRIJS_RECHTS;
+      rijdenMetPID(false, false,false,true);
+      xb.print("case 2: Grijs rechts");
       break;
 
-
     case 4:
-      //SCHUINE RECHTS
-      //motoren.setSpeed(200, 50);
-      integral = 0;
-      rijdenMetPID();
-      xb.print("case 4 : SCHUIN RECHTS");
+      //Bruin gedetecteerd, start zoeken en duwen van blokje.
+      proxBlok.start();
+      xb.print("case 4: Bruin gedetecteerd");
+      //proxBlok.zoekBlok();
+     
       break;
 
     case 5:
-      //groene lijn
-      integral = 0;
-      motoren.setSpeed(100, 100);
-      xb.print("case  5: GROEN");
+      //Helling gedetecteerd, sneller rijden.
+      rijdenMetPID(false, true,false,false);
+
+     // xb.print("case 4 : Helling gedetecteerd");
       break;
 
     case 6:
-      //bruine lijn
-      break;
-
-
-    case 10:
-      //stoppen voor 2 sec
+      //Grijs stoppen voor 2 seconden.
       motoren.stop();
       delay(2000);
-      xb.print("case 10: STOP 2 SEC");
+      rijdenMetPID(false, false, false, false);
+     xb.print("case 6: Stoppen en balanceren ");
       break;
+
+    case 7:
+    xb.print("case 7: groenlinks");
+      motoren.setSpeed(-100,200);
+      delay(1000);
 
     case 11:
       //stoppen als op knop B gedrukt.
-      // motoren.stop();
-      // xb.print("case 11: STOP");
 
       motoren.stop();
       xb.print("case 11: STOP");
@@ -192,8 +195,15 @@ void loop() {
         motoren.stop();
         delay(50);
       }
-      Serial1.println("Hervat!");
-      
+
+      break;
+    //TODO fixen, voor stippellijnen
+    case 13: 
+      motoren.setSpeed(100,100);
+      delay(1000);
+      break;
+
+    default:
       break;
   }
 }

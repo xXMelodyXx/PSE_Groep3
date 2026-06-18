@@ -43,21 +43,6 @@ bool Xbee::toetsIngedrukt(char toets) {
          command == toupper(toets);
 }
 
-bool Xbee::knopA() {
-
-  return aKnop.getSingleDebouncedPress();
-}
-
-bool Xbee::knopB() {
-
-  return bKnop.getSingleDebouncedPress();
-}
-
-bool Xbee::knopC() {
-
-  return cKnop.getSingleDebouncedPress();
-}
-
 // void Xbee::print(String text){
 //     Serial1.println(text);
 // }
