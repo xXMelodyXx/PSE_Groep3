@@ -1,0 +1,19 @@
+var searchData=
+[
+  ['geefhoek_0',['geefHoek',['../class_helling.html#accd43e4c586ebe4392af0516aa3b097a',1,'Helling']]],
+  ['geen_5fgrijs_1',['GEEN_GRIJS',['../zumootje_8ino.html#ac946b12918261c6aed1477c8892de1afabe94ef50a458cb9614d4509283d03536',1,'zumootje.ino']]],
+  ['gemiddelde_2',['Gemiddelde',['../structsensordata.html#ae316f66f1b22d3241be6bd360eb0fcea',1,'sensordata']]],
+  ['getbeginhoek_3',['getBeginHoek',['../class_helling.html#ae77ba34ce81eb4773373ad197fad1aec',1,'Helling']]],
+  ['getcalibratie_4',['getCalibratie',['../class_lijnsensor.html#a9b7903542090cc30fea368011983976e',1,'Lijnsensor']]],
+  ['getcommand_5',['getCommand',['../class_xbee.html#a1484d30b4ab4b8ff8150d13fa3d14451',1,'Xbee']]],
+  ['getencoderlinks_6',['getEncoderLinks',['../class_motoren.html#a7e614684a6a5bf5d3cc9fd44a4c1663d',1,'Motoren']]],
+  ['getencoderrechts_7',['getEncoderRechts',['../class_motoren.html#a9568782e9b528998b44f70015e3bac38',1,'Motoren']]],
+  ['getgemiddelde_8',['getGemiddelde',['../class_lijnsensor.html#a464ceb140b66f4995f81bb49e4c284c5',1,'Lijnsensor']]],
+  ['grijs_5flinks_9',['GRIJS_LINKS',['../zumootje_8ino.html#ac946b12918261c6aed1477c8892de1afaeccc53ae5a13dc41be8ea6b798795581',1,'zumootje.ino']]],
+  ['grijs_5frechts_10',['GRIJS_RECHTS',['../zumootje_8ino.html#ac946b12918261c6aed1477c8892de1afa0d955e8dcca5451b2b80c58156008bc9',1,'zumootje.ino']]],
+  ['grijsdetected_11',['GrijsDetected',['../class_lijnsensor.html#a4d5fbea9bbed920afe53d9340e3a5be7',1,'Lijnsensor']]],
+  ['grijskeuze_12',['GrijsKeuze',['../zumootje_8ino.html#ac946b12918261c6aed1477c8892de1af',1,'zumootje.ino']]],
+  ['grijskeuze_13',['grijsKeuze',['../zumootje_8ino.html#a78a668febb6c10e3179509d474a3efff',1,'zumootje.ino']]],
+  ['grijsposition_14',['GrijsPosition',['../class_lijnsensor.html#a142d6542e3d5b181184b18d4c0eca4af',1,'Lijnsensor']]],
+  ['groendetected_15',['GroenDetected',['../class_lijnsensor.html#afb5de5b284cdbece7f71486bfa305943',1,'Lijnsensor']]]
+];
