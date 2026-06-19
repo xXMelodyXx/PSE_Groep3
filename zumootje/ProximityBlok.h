@@ -21,26 +21,53 @@ private:
   long draai360Ticks;
   int objectMinWaarde;
 
-  void rijdVooruitTicks(long ticks);
-  void zoekBlok();
-  void draaiTerug(long ticks);
-  void duwTotZwart();
-
-  //bool BruinDetected();
-  //bool ZwartDetected();
-
-  void leesProximity(int &links, int &rechts);
-  long gemiddeldeTicks();
-
-  void stop();
+  
 
 public:
   ProximityBlok(Motoren* m, Lijnsensor* l);
 
-  //void setLijnsensor(Lijnsensor* l);
-
+  /**
+   *  @brief Initialiseert de proximityblok
+   */
   void init();
+
+  /**
+   * @brief start de zumo voor het detecteren en duwen van een blok
+   */
   void start();
+
+  /**
+   * @brief rijd vooruit tot een blok gedetecteerd wordt
+   */
+  void rijdVooruitTicks(long ticks);
+
+  /**
+   * @brief zoekt naar een blok
+   */
+  void zoekBlok();
+  /**
+   * @brief draait de zumo terug
+   */
+  void draaiTerug(long ticks);
+  /**
+   * @brief duwt tot een zwarte lijn gedetecteerd wordt
+   */
+  void duwTotZwart();
+
+  /**
+   * @brief leest de proximity sensoren
+   * @param links De waarde van de linkerste proximity sensor
+   * @param rechts De waarde van de rechterste proximity sensor
+   */
+  void leesProximity(int &links, int &rechts);
+
+  /**
+   * @brief berekent het gemiddelde aantal ticks
+   * @return Het gemiddelde aantal ticks
+   */
+  long gemiddeldeTicks();
+
+  //void stop();
 };
 
 #endif
