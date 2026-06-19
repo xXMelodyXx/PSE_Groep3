@@ -185,9 +185,9 @@ bool Lijnsensor::GrijsDetected(sensordata meting) {
 
 int Lijnsensor::GrijsPosition(sensordata meting) {
   //hierr changes gemaakt
-  ZwartDetected(meting);
-  GrijsDetected(meting);
-  //
+ // ZwartDetected(meting);
+  //GrijsDetected(meting);
+  
 
   if (GrijsDetected(meting)) {
     if (grijssensors.detected[0] && grijssensors.detected[4]) {
@@ -249,16 +249,8 @@ bool Lijnsensor::BruinDetected(sensordata meting) {
 bool Lijnsensor::BruinLijn(sensordata meting) {
   //sensordata meting = getGemiddelde(1);
   BruinDetected(meting);
-  return bruinsensors.detected[0] && bruinsensors.detected[4] && bruinsensors.detected[2];
+  return bruinsensors.detected[0] && bruinsensors.detected[4];
 }
-
-/*
-bool Lijnsensor:: groenLinks(sensordata meting){
-  meting = getGemiddelde(1);
-  GroenDetected(meting);
-  return groensensors.detected[0];
-}
-*/
 
 
 bool Lijnsensor::zwartKruispunt() {
