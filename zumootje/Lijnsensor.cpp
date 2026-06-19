@@ -1,15 +1,15 @@
 #include "Lijnsensor.h"
 #define NMRSENSOR 5
 
-Lijnsensor::Lijnsensor(Xbee* xbee, ProximityBlok* p)
-  : xb(xbee), proximityBlok(p) {}
+Lijnsensor::Lijnsensor(Xbee* xbee)
+  : xb(xbee) {}
 
 
 //Motoren motors;
 
 void Lijnsensor::init() {
   helling.start();
-  proximityBlok->init();
+  //proximityBlok->init();
   lineSensors.initFiveSensors();
 }
 
@@ -140,8 +140,8 @@ void Lijnsensor::calibrateBruin() {
   sensordata tempBruin = calibreer("bruin");
   for (int i = 0; i < NMRSENSOR; i++) {
     bruinsensors.Gemiddelde[i] = tempBruin.Gemiddelde[i];
-    bruinsensors.Min[i] = tempBruin.Min[i] * 0.8;  //toepassing correctie
-    bruinsensors.Max[i] = tempBruin.Max[i] * 1.2;
+    bruinsensors.Min[i] = tempBruin.Min[i] * 0.9;  //toepassing correctie, 0.8
+    bruinsensors.Max[i] = tempBruin.Max[i] * 1.2;  //1.2
   }
 }
 
@@ -184,6 +184,11 @@ bool Lijnsensor::GrijsDetected(sensordata meting) {
 }
 
 int Lijnsensor::GrijsPosition(sensordata meting) {
+  //hierr changes gemaakt
+  ZwartDetected(meting);
+  GrijsDetected(meting);
+  //
+
   if (GrijsDetected(meting)) {
     if (grijssensors.detected[0] && grijssensors.detected[4]) {
       return 6;
@@ -191,17 +196,13 @@ int Lijnsensor::GrijsPosition(sensordata meting) {
 
     if (grijssensors.detected[0]) {
       if (zwartsensors.detected[0]) {
-        // grijsLinks = true;
-        // grijsRechts = false;
-        // grijsActief = true;
+        
         return 2;
       }
     }
     if (grijssensors.detected[4]) {
       if (zwartsensors.detected[4]) {
-        // grijsRechts = true;
-        // grijsLinks = false;
-        // grijsActief = true;
+        
         return 3;
       }
     }
@@ -245,6 +246,12 @@ bool Lijnsensor::BruinDetected(sensordata meting) {
   return bruinSeen;
 }
 
+bool Lijnsensor::BruinLijn(sensordata meting) {
+  //sensordata meting = getGemiddelde(1);
+  BruinDetected(meting);
+  return bruinsensors.detected[0] && bruinsensors.detected[4] && bruinsensors.detected[2];
+}
+
 /*
 bool Lijnsensor:: groenLinks(sensordata meting){
   meting = getGemiddelde(1);
@@ -276,38 +283,36 @@ int Lijnsensor::bepaalCase() {
     return 3;
   }
 
+  if (BruinLijn(meting)) {
+    return 4;
+  }
+
+
   if (helling.hellingGedetecteerd()) {
     return 5;
-    if (!helling.hellingGedetecteerd()) {
-      delay(1500);
-      return 13;
-    }
+    // if (!helling.hellingGedetecteerd()) {
+    //   return 13;
+    // }
   }
+
   if (GrijsPosition(meting) == 6) {
     return 6;
   }
 
+
   if (ZwartDetected(meting)) {
     return 0;
   }
-  /*
-  if(groenLinks()){
-    return 7;
-  }
-  */
+
 
   if (GroenDetected(meting)) {
     return 1;
   }
 
-  if (BruinDetected(meting) == 4) {
-    return 4;
-  }
 
   else {
     return 0;
   }
-
 
 
   //return -1;
