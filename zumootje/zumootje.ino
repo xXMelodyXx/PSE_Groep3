@@ -1,0 +1,212 @@
+#include <Wire.h>
+#include "Lijnsensor.h"
+#include <Zumo32U4.h>
+#include "Xbee.h"
+#include "Motoren.h"
+#include "ProximityBlok.h"
+
+enum GrijsKeuze {
+  GEEN_GRIJS,
+  GRIJS_LINKS,
+  GRIJS_RECHTS
+};
+
+GrijsKeuze grijsKeuze = GEEN_GRIJS;
+
+
+Zumo32U4ButtonC buttonC;
+Zumo32U4ButtonA buttonA;
+
+Xbee xb;
+Motoren motoren;
+
+
+Lijnsensor lijnsensor(&xb);
+ProximityBlok proxBlok(&motoren, &lijnsensor);
+
+
+double BASE_SPEED = 200.0;  // basissnelheid
+double MAX_SPEED = 400.0;   // maximale motorsnelheid
+double MIN_SPEED = -400.0;  // minimale motorsnelheid
+//0.6, 0.63, 
+const float KP = 0.63; 
+const float KI = 0.0;    
+const float KD = 0.0;   
+
+// PID variabelen
+float prevError = 0;
+float integral = 0;
+
+void rijdenMetPID(bool groendetected, bool hellingdetected, bool grijsLinks, bool grijsRechts) {
+  int positie = lijnsensor.leesPositie();
+
+
+  float error = positie - 3000;
+
+  //niet gebruikt
+  integral += error;
+  integral = constrain(integral, -5000, 5000);
+
+  float derivative = error - prevError;
+  prevError = error;
+
+  float correctie = (KP * error) + (KI * integral) + (KD * derivative);
+
+  if (!groendetected) {
+    int linksSnelheid = constrain((int)(BASE_SPEED + correctie), MIN_SPEED, MAX_SPEED);
+    int rechtsSnelheid = constrain((int)(BASE_SPEED - correctie), MIN_SPEED, MAX_SPEED);
+    motoren.setSpeed(linksSnelheid, rechtsSnelheid);
+  }
+  if (groendetected) {
+    int linksSnelheid = constrain((int)(BASE_SPEED / 1.3 + correctie), MIN_SPEED / 1.3, MAX_SPEED );
+    int rechtsSnelheid = constrain((int)(BASE_SPEED / 1.3 - correctie), MIN_SPEED / 1.3, MAX_SPEED);
+    motoren.setSpeed(linksSnelheid, rechtsSnelheid);
+  }
+  if(hellingdetected){
+    int linksSnelheid = constrain((int)(BASE_SPEED * 2 + correctie), MIN_SPEED, MAX_SPEED);
+    int rechtsSnelheid = constrain((int)(BASE_SPEED * 2 - correctie), MIN_SPEED, MAX_SPEED);
+    motoren.setSpeed(linksSnelheid, rechtsSnelheid);
+  }
+  if(grijsLinks){
+    int linksSnelheid = constrain((int)(BASE_SPEED / 2.9  + correctie), MIN_SPEED, MAX_SPEED); //2.9 
+    int rechtsSnelheid = constrain((int)(BASE_SPEED * 1.2 - correctie), MIN_SPEED, MAX_SPEED);//1.2
+    motoren.setSpeed(linksSnelheid, rechtsSnelheid);
+  }
+
+  if(grijsRechts){
+    int linksSnelheid = constrain((int)(BASE_SPEED * 1.2  + correctie), MIN_SPEED, MAX_SPEED);
+    int rechtsSnelheid = constrain((int)(BASE_SPEED / 2.9 - correctie), MIN_SPEED, MAX_SPEED);
+    motoren.setSpeed(linksSnelheid, rechtsSnelheid);
+  }
+
+  
+}
+
+void setup() {
+
+  Serial1.begin(9600);
+  xb.print("test");
+  delay(2000);
+  buttonC.waitForButton();
+  lijnsensor.init();
+  motoren.initialiseer(&lijnsensor);
+  proxBlok.init();
+
+  lijnsensor.getCalibratie();
+  xb.print("wait for button A");
+  buttonA.waitForButton();
+  xb.print("start!");
+
+  xb.begin();
+}
+
+
+void loop() {
+  int keuze = lijnsensor.bepaalCase();
+
+  if (grijsKeuze != GEEN_GRIJS && lijnsensor.zwartKruispunt()) {
+
+    if (grijsKeuze == GRIJS_LINKS) {
+      xb.print("Grijs links onthouden -> links op kruising");
+      motoren.setSpeed(-100, 200);
+
+      //rijdenMetPID(false,false,true,false);
+      delay(2500);
+    }
+
+    if (grijsKeuze == GRIJS_RECHTS) {
+      xb.print("Grijs rechts onthouden -> rechts op kruising");
+      //rijdenMetPID(false, false,false,true);
+      motoren.setSpeed(250, -100); //200, -100
+      delay(2000);
+    }
+
+    grijsKeuze = GEEN_GRIJS;
+  }
+
+   
+
+
+ 
+ 
+  switch (keuze) {
+   
+
+    case 0:
+      //Zwarte lijn volgen
+      rijdenMetPID(false, false,false,false);
+      //xb.print("case 0 : Zwart gedetecteerd");
+      break;
+
+
+    case 1:
+      //Groene lijn volgen
+      //groendetected = true;
+      rijdenMetPID(true, false,false,false);
+     // xb.print("case 1: Groen gedetecteerd");
+      break;
+
+    case 2:
+      //Grijs Links
+      grijsKeuze = GRIJS_LINKS;
+      rijdenMetPID(false, false,true,false);
+     
+      xb.print("case 2: Grijs Links");
+      break;
+
+    case 3:
+      //Grijs Rechts
+      grijsKeuze = GRIJS_RECHTS;
+      rijdenMetPID(false, false,false,true);
+      xb.print("case 2: Grijs rechts");
+      break;
+
+    case 4:
+      //Bruin gedetecteerd, start zoeken en duwen van blokje.
+      proxBlok.start();
+      xb.print("case 4: Bruin gedetecteerd");
+      //proxBlok.zoekBlok();
+     
+      break;
+
+    case 5:
+      //Helling gedetecteerd, sneller rijden.
+      rijdenMetPID(false, true,false,false);
+
+     // xb.print("case 4 : Helling gedetecteerd");
+      break;
+
+    case 6:
+      //Grijs stoppen voor 2 seconden.
+      motoren.stop();
+      delay(2000);
+      rijdenMetPID(false, false, false, false);
+     xb.print("case 6: Stoppen en balanceren ");
+      break;
+
+    case 7:
+    xb.print("case 7: groenlinks");
+      motoren.setSpeed(-100,200);
+      delay(1000);
+
+    case 11:
+      //stoppen als op knop B gedrukt.
+
+      motoren.stop();
+      xb.print("case 11: STOP");
+      while (buttonA.isPressed() == false) {
+        motoren.stop();
+        delay(50);
+      }
+
+      break;
+    //TODO fixen, voor stippellijnen
+    case 13: 
+      motoren.setSpeed(100,100);
+      delay(1000);
+      break;
+
+    default:
+      break;
+  }
+}
