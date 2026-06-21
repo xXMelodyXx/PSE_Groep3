@@ -24,10 +24,11 @@ private:
   unsigned int sensorValues[5];
   int positie;
 
+/*
   bool grijsLinks = false;
   bool grijsRechts = false;
   bool grijsActief = false;
-
+*/
 
   sensordata groensensors;
   sensordata grijssensors;
@@ -40,120 +41,116 @@ private:
 
 
 public:
-  /*! \brief Constructor voor de Lijnsensor klasse
-  *  \param xbee Pointer naar de Xbee klasse voor communicatie
-  *  \param p Pointer toegevoegd voor toegang tot ProximityBlok functies
+  /*! @brief Constructor voor de Lijnsensor klasse
+  *  @param xbee Pointer naar de Xbee klasse voor communicatie
+  *  @param p Pointer toegevoegd voor toegang tot ProximityBlok functies
   */
   Lijnsensor(Xbee* xbee);
 
   /*! 
-  \brief Initialiseert de lijnsensor, inclusief kalibratie
+  @brief Initialiseert de lijnsensor, inclusief kalibratie
   */
   void init();
 
   /*! 
-  \brief Leest de lijnsensoren en roept de juiste kalibratiefunctie 
+  @brief Leest de lijnsensoren en roept de juiste kalibratiefunctie 
   aan per kleur (wit, zwart, groen, bruin, grijs)
   */
   void getCalibratie();
 
   /*! 
-  \brief Kalibreert de sensoren voor wit
+  @brief Kalibreert de sensoren voor wit
    */
   void calibrateWit();
 
   /*! 
-  \brief Kalibreert de sensoren voor zwart
+  @brief Kalibreert de sensoren voor zwart
    */
   void calibrateZwart();
 
   /*! 
-    \brief Kalibreert de sensoren voor groen
+    @brief Kalibreert de sensoren voor groen
     */
   void calibrateGroen();
 
   /*! 
-  \brief Kalibreert de sensoren voor Bruin
+  @brief Kalibreert de sensoren voor Bruin
   */
   void calibrateBruin();
 
   /*! 
-  \brief Kalibreert de sensoren voor grijs
+  @brief Kalibreert de sensoren voor grijs
   */
   void calibrateGrijs();
 
-  /*! \brief Leest de positie van de lijn. 
-   *  \return 1000 als bij sensor 0, 2000 als bij sensor 1, ..., 5000 als bij sensor 4.
-   *  \return 3000 als geen lijn gedetecteerd (gaat dan gewoon rechtdoor)
+  /*! @brief Leest de positie van de lijn. 
+   *  @return 1000 als bij sensor 0, 2000 als bij sensor 1, ..., 5000 als bij sensor 4.
+   *  @return 3000 als geen lijn gedetecteerd (gaat dan gewoon rechtdoor)
    */
   int leesPositie();
 
   /*! 
-  \brief Voert een eenvoudige kalibratie uit om de zumo 
+  @brief Voert een eenvoudige kalibratie uit om de zumo 
   voor te bereiden op het detecteren van kleuren
    */
   void simpelCalibreer();
 
   /*! 
-  \brief Kalibreert de sensoren voor een bepaalde kleur
+  @brief Kalibreert de sensoren voor een bepaalde kleur
    */
   sensordata calibreer(String kleur);
 
   /*! 
-  \brief Haalt het gemiddelde van de sensordata op
+  @brief Haalt het gemiddelde van de sensordata op
    */
   sensordata getGemiddelde(int hoeveelMetingen);
 
   /*! 
-  \brief Controleert of grijs gedetecteerd is
+  @brief Controleert of grijs gedetecteerd is
    */
   bool GrijsDetected(sensordata);
 
   /*! 
-  \brief Controleert of groen gedetecteerd is
+  @brief Controleert of groen gedetecteerd is
    */
   bool GroenDetected(sensordata);
 
   /*! 
-  \brief Controleert of bruin gedetecteerd is
+  @brief Controleert of bruin gedetecteerd is
    */
   bool BruinDetected(sensordata);
 
   /*! 
-  \brief Controleert of zwart gedetecteerd is
+  @brief Controleert of zwart gedetecteerd is
    */
   bool ZwartDetected(sensordata);
 
   /*! 
-  \brief Controleert of een zwart kruispunt gedetecteerd is
+  @brief Controleert of een zwart kruispunt gedetecteerd is
    */
   bool zwartKruispunt();
 
  // bool groenLinks();
 
   /*! 
-    \brief Bepaalt de positie van het grijze tape
-    \param data De sensordata
-    \return 2 als tape links, 3 als tape rechts, 6 als tape in het midden, anders -1
+    @brief Bepaalt de positie van het grijze tape
+    @param data De sensordata
+    @return 2 als tape links, 3 als tape rechts, 6 als tape in het midden, anders -1
    */
   int GrijsPosition(sensordata);
 
-  /*! 
-    \brief Logica voor wat er moet gebeuren als grijs tape wordt gedetecteerd
-    \param motoren De motoren
-   */
-  bool handleGrijsTape(Motoren);
-
+/** @brief Controleert of sensor 0 en 4 een bruine lijn detecteert, voor nauwkeurigheid
+ *  @param data De sensordata
+ *  @return true als sensor 0 EN 4 gedetecteerd zijn, anders false
+ */
   bool BruinLijn(sensordata);
 
 
   /*! 
-      \brief Bepaalt welke case moet worden uitgevoerd
-      \return Een integer die de actie aangeeft
+      @brief Bepaalt welke case moet worden uitgevoerd
+      @return Een integer die de actie aangeeft
     */
   int bepaalCase();
 
 
-
-  // void resetGrijs();
 };

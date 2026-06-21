@@ -113,7 +113,7 @@ void ProximityBlok::zoekBlok() {
   delay(300);
 
   if (!bestePuntGevonden) {
-    stop();
+    motoren->stop();
   }
 
   // Terugdraaien naar het punt waar de sensoren het sterkst waren
@@ -167,7 +167,7 @@ void ProximityBlok::duwTotZwart() {
     delay(20);
   }
 
-  stop();
+  motoren->stop();
 }
  
 
@@ -185,10 +185,13 @@ long ProximityBlok::gemiddeldeTicks() {
   return (links + rechts) / 2;
 }
 
+/*
 void ProximityBlok::stop() {
   motoren->stop();
 
   while (true) {
     delay(100);
   }
+
 }
+*/
